@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import ProjectRole from '#models/project_role'
 
 export default class Project extends BaseModel {
     @column({ isPrimary: true })
@@ -10,6 +12,9 @@ export default class Project extends BaseModel {
 
     @column()
     declare image?: string
+
+    @hasMany(() => ProjectRole)
+    declare roles: HasMany<typeof ProjectRole>
 
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime

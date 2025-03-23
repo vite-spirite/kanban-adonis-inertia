@@ -1,9 +1,11 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
+import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbRememberMeTokensProvider } from '@adonisjs/auth/session'
+import ProjectRole from '#models/project_role'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
     uids: ['email'],
@@ -24,6 +26,14 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
     @column({ serializeAs: null })
     declare password: string
+
+    @manyToMany(() => ProjectRole, {
+        localKey: 'id',
+        pivotForeignKey: 'user_id',
+        relatedKey: 'id',
+        pivotRelatedForeignKey: 'role_id',
+    })
+    declare roles: ManyToMany<typeof ProjectRole>
 
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime
