@@ -1,9 +1,11 @@
-import type { UserPresenter } from '#types/user.dto'
 import type { MinimalProject } from '#types/project.dto'
+import type { MeDto } from '#types/user.dto'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
 
 import { defineConfig } from '@adonisjs/inertia'
 import { ProjectService } from '#services/project_service'
+
+import { UserPresenter } from '#presenters/user_presenter'
 
 const inertiaConfig = defineConfig({
     /**
@@ -15,10 +17,17 @@ const inertiaConfig = defineConfig({
      * Data that should be shared with all rendered pages
      */
     sharedData: {
-        user: (ctx) => ctx.inertia.always(() => ctx.auth.user),
+        user: (ctx) =>
+            ctx.inertia.always(() => {
+                console.log('reload user data')
+                if (ctx.auth.user) {
+                    return new UserPresenter(ctx.auth.user).presentMe()
+                } else {
+                    return null
+                }
+            }),
         projects: (ctx) =>
             ctx.inertia.optional(() => {
-                console.log('reload projects data')
                 if (ctx.auth.user) {
                     const projectService = new ProjectService()
                     return projectService.getMinimalUserProjects(ctx.auth.user)
@@ -41,7 +50,7 @@ export default inertiaConfig
 
 declare module '@adonisjs/inertia/types' {
     export interface SharedProps extends InferSharedProps<typeof inertiaConfig> {
-        user: UserPresenter | null
+        user: MeDto | null
         projects: MinimalProject[]
     }
 }

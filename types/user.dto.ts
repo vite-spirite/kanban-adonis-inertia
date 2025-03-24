@@ -1,3 +1,10 @@
-import type User from '#models/user.js'
+import type User from '#models/user'
 
-export type UserPresenter = Pick<User, 'id' | 'fullName' | 'email' | 'createdAt' | 'updatedAt'>
+export type MeDto = Pick<User, 'id' | 'fullName' | 'email' | 'createdAt' | 'updatedAt'>
+
+export type UserDto = {
+    id: number
+    fullName: string
+    createdAt: string
+    updatedAt: string
+}

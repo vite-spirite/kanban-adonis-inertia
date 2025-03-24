@@ -46,7 +46,7 @@
             <ul class="flex flex-col justify-center items-start text-gray-400 space-y-2 w-full">
                 <li class="w-full" v-for="project in projects" :key="project.id">
                     <Link
-                        :href="'/projects/' + project.id"
+                        :href="'/dashboard/projects/' + project.id"
                         class="inline-flex flex-row justify-start items-center space-x-2 w-full hover:bg-black/5 rounded-lg p-2 hover:text-gray-500 transition"
                     >
                         <img
@@ -75,11 +75,11 @@
 
 <script lang="ts" setup>
 import type { MinimalProject } from '#types/project.dto'
-import type { UserPresenter } from '#types/user.dto'
+import type { MeDto } from '#types/user.dto'
 
 import { Link } from '@inertiajs/vue3'
 
-const { projects } = defineProps<{ user: UserPresenter; projects: MinimalProject[] }>()
+const { projects } = defineProps<{ user: MeDto; projects: MinimalProject[] }>()
 
 console.log(projects)
 </script>

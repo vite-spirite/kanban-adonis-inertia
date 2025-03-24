@@ -18,7 +18,7 @@ export default class ProjectRole extends BaseModel {
     @belongsTo(() => Project)
     declare project: BelongsTo<typeof Project>
 
-    @hasMany(() => RolePermission)
+    @hasMany(() => RolePermission, { localKey: 'id', foreignKey: 'roleId' })
     declare permissions: HasMany<typeof RolePermission>
 
     @manyToMany(() => User, {
@@ -26,6 +26,7 @@ export default class ProjectRole extends BaseModel {
         pivotForeignKey: 'role_id',
         relatedKey: 'id',
         pivotRelatedForeignKey: 'user_id',
+        pivotTable: 'project_user_roles',
     })
     declare users: ManyToMany<typeof User>
 

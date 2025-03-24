@@ -27,6 +27,8 @@ router.get('/logout', [UserController, 'logout']).as('logout').use(middleware.au
 router
     .group(() => {
         router.get('/', [DashboardController, 'index']).as('dashboard.index')
+
+        router.get('/projects/:id', [DashboardController, 'project']).as('dashboard.project')
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

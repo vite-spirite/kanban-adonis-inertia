@@ -27,4 +27,11 @@ export class ProjectService {
                 userRoles.map((role) => role.projectId)
             )
     }
+
+    async findById(id: number): Promise<Project> {
+        return Project.query()
+            .preload('roles', (query) => query.preload('permissions').preload('users'))
+            .where('id', id)
+            .firstOrFail()
+    }
 }
