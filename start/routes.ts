@@ -21,6 +21,8 @@ router.post('/register', [UserController, 'register']).use(middleware.guest())
 router.get('/login', [HomeController, 'login']).as('login').use(middleware.guest())
 router.post('/login', [UserController, 'login']).use(middleware.guest())
 
+router.get('/logout', [UserController, 'logout']).as('logout').use(middleware.auth())
+
 router
     .group(() => {
         router.get('/', ({ inertia }) => inertia.render('dashboard/index')).as('dashboard.index')

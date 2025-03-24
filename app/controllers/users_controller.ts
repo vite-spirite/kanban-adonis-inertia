@@ -37,4 +37,9 @@ export default class UsersController {
 
         return response.redirect().toRoute('dashboard.index')
     }
+
+    async logout({ response, auth }: HttpContext) {
+        await auth.use('web').logout()
+        return response.redirect().toRoute('home')
+    }
 }
