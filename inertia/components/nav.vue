@@ -22,9 +22,15 @@
 
             <Link
                 v-if="pageProps.user"
+                href="/dashboard"
+                class="font-roboto text-xl font-medium px-4 py-2 rounded-md text-gray-100 bg-blue-500 hover:bg-blue-400 transition-all"
+                >Dashboard</Link
+            >
+
+            <Link
+                v-if="pageProps.user"
                 href="/logout"
                 class="font-roboto text-xl font-medium px-4 py-2 rounded-md text-gray-100 bg-red-500 hover:bg-red-400 transition-all"
-                :class="{ '!bg-blue-400': $page.url === '/register' }"
                 >Logout</Link
             >
         </div>
