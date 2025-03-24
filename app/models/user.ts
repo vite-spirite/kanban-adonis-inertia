@@ -32,6 +32,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
         pivotForeignKey: 'user_id',
         relatedKey: 'id',
         pivotRelatedForeignKey: 'role_id',
+        pivotTable: 'project_user_roles',
     })
     declare roles: ManyToMany<typeof ProjectRole>
 

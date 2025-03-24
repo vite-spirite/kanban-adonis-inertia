@@ -12,6 +12,7 @@ import { middleware } from '#start/kernel'
 
 const HomeController = () => import('#controllers/home_controller')
 const UserController = () => import('#controllers/users_controller')
+const DashboardController = () => import('#controllers/dashboard_controller')
 
 router.get('/', [HomeController, 'index']).as('home')
 
@@ -25,7 +26,7 @@ router.get('/logout', [UserController, 'logout']).as('logout').use(middleware.au
 
 router
     .group(() => {
-        router.get('/', ({ inertia }) => inertia.render('dashboard/index')).as('dashboard.index')
+        router.get('/', [DashboardController, 'index']).as('dashboard.index')
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

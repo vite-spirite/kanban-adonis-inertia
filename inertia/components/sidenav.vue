@@ -1,6 +1,6 @@
 <template>
     <div
-        class="min-h-screen w-1/10 flex flex-col justify-start items-start overflow-y-auto bg-gray-100 rounded-r-2xl p-2 space-y-5"
+        class="min-h-screen w-1/8 flex flex-col justify-start items-start overflow-y-auto bg-gray-100 rounded-r-2xl p-2 space-y-5"
     >
         <div class="pb-0 pt-4 w-full text-left px-2">
             <Link href="/">LOGO</Link>
@@ -44,26 +44,21 @@
             </div>
 
             <ul class="flex flex-col justify-center items-start text-gray-400 space-y-2 w-full">
-                <li class="w-full">
+                <li class="w-full" v-for="project in projects" :key="project.id">
                     <Link
-                        href="/"
-                        class="inline-block w-full hover:bg-black/5 rounded-lg p-2 hover:text-gray-500 transition"
-                        >Project 1</Link
+                        :href="'/projects/' + project.id"
+                        class="inline-flex flex-row justify-start items-center space-x-2 w-full hover:bg-black/5 rounded-lg p-2 hover:text-gray-500 transition"
                     >
-                </li>
-                <li class="w-full">
-                    <Link
-                        href="/"
-                        class="inline-block w-full hover:bg-black/5 rounded-lg p-2 hover:text-gray-500 transition"
-                        >Project 2</Link
-                    >
-                </li>
-                <li class="w-full">
-                    <Link
-                        href="/"
-                        class="inline-block w-full hover:bg-black/5 rounded-lg p-2 hover:text-gray-500 transition"
-                        >Project 3</Link
-                    >
+                        <img
+                            :src="
+                                project.image ||
+                                `https://ui-avatars.com/api/?name=${project.name}&size=64`
+                            "
+                            class="w-6 h-6 rounded-full"
+                        />
+
+                        <span>{{ project.name }}</span>
+                    </Link>
                 </li>
 
                 <li class="w-full">
@@ -79,11 +74,12 @@
 </template>
 
 <script lang="ts" setup>
-import type User from '#models/user'
+import type { MinimalProject } from '#types/project.dto'
+import type { UserPresenter } from '#types/user.dto'
 
 import { Link } from '@inertiajs/vue3'
 
-const { user } = defineProps<{ user: User }>()
+const { projects } = defineProps<{ user: UserPresenter; projects: MinimalProject[] }>()
 
-console.log(user)
+console.log(projects)
 </script>

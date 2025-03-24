@@ -21,7 +21,6 @@ createInertiaApp({
             import.meta.glob<DefineComponent>('../pages/**/*.vue')
         )
 
-        console.log(name)
         if (name.startsWith('dashboard')) {
             pages.default.layout = Layout
         }
