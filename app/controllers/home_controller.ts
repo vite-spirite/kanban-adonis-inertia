@@ -8,4 +8,8 @@ export default class HomeController {
     async register({ inertia }: HttpContext) {
         return inertia.render('register')
     }
+
+    async login({ inertia }: HttpContext) {
+        return inertia.render('login')
+    }
 }

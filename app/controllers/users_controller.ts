@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { RegisterValidator } from '#validators/auth'
+import { LoginValidator, RegisterValidator } from '#validators/auth'
 import { inject } from '@adonisjs/core'
 import { UserService } from '#services/user_service'
 
@@ -18,5 +18,23 @@ export default class UsersController {
 
         await auth.use('web').login(user, false)
         return response.redirect().toRoute('home')
+    }
+
+    async login({ response, request, auth }: HttpContext) {
+        const payload = await LoginValidator.validate(request.all())
+
+        if (!payload.rememberMe) {
+            payload.rememberMe = false
+        }
+
+        const user = await this.userService.verifyCredentials(payload)
+
+        if (!user) {
+            return response.redirect().back()
+        }
+
+        await auth.use('web').login(user, payload.rememberMe)
+
+        return response.redirect().toRoute('dashboard.index')
     }
 }

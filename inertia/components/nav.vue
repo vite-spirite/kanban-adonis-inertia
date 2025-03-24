@@ -7,7 +7,7 @@
         <div class="flex flex-row justify-start items-center space-x-4">
             <Link
                 v-if="!pageProps.user"
-                href="/"
+                href="/login"
                 class="font-roboto text-xl font-medium bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 transition-all"
                 >Login</Link
             >

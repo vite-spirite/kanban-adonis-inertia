@@ -1,5 +1,5 @@
 <template>
-    <Head title="Register" />
+    <Head title="Login" />
 
     <div class="w-full h-min-screen">
         <Navigation />
@@ -7,7 +7,7 @@
         <div
             class="xl:w-xl mx-auto border-dashed border-gray-200 border-4 rounded-lg px-4 py-2 mt-20"
         >
-            <h1 class="font-bold font-open-sans text-2xl py-2">Register</h1>
+            <h1 class="font-bold font-open-sans text-2xl py-2">Login</h1>
 
             <form
                 @submit.prevent="submit"
@@ -22,27 +22,12 @@
                         name="email"
                         id="email"
                         class="border-2 text-gray-900 border-gray-200 rounded-md p-2 w-full outline-0 focus:border-blue-500 transition"
-                        :class="{ '!border-red-500': form.errors.email }"
+                        :class="{
+                            '!border-red-500': form.errors.email,
+                        }"
                     />
                     <span class="text-red-500 font-medium" v-if="form.errors.email">{{
                         form.errors.email
-                    }}</span>
-                </div>
-
-                <div class="flex flex-col justify-start items-start w-full space-y-1">
-                    <label for="full_name" class="font-roboto font-normal font-xl"
-                        >Full name:</label
-                    >
-                    <input
-                        v-model="form.fullName"
-                        type="text"
-                        name="full_name"
-                        id="full_name"
-                        class="border-2 text-gray-900 border-gray-200 rounded-md p-2 w-full outline-0 focus:border-blue-500 transition"
-                        :class="{ '!border-red-500': form.errors.fullName }"
-                    />
-                    <span class="text-red-500 font-medium" v-if="form.errors.fullName">{{
-                        form.errors.fullName
                     }}</span>
                 </div>
 
@@ -54,30 +39,32 @@
                         name="password"
                         id="password"
                         class="border-2 text-gray-900 border-gray-200 rounded-md p-2 w-full outline-0 focus:border-blue-500 transition"
-                        :class="{ '!border-red-500': form.errors.password }"
+                        :class="{
+                            '!border-red-500': form.errors.password,
+                        }"
                     />
+
+                    <div class="w-full text-right">
+                        <Link href="/" class="text-blue-500">Forgot password?</Link>
+                    </div>
+
                     <span class="text-red-500 font-medium" v-if="form.errors.password">{{
                         form.errors.password
                     }}</span>
                 </div>
+                <div class="flex flex-row justify-start items-start w-full space-x-5">
+                    <span>remember me ?</span>
 
-                <div class="flex flex-col justify-start items-start w-full space-y-1">
-                    <label for="password_confirmation" class="font-roboto font-normal font-xl"
-                        >Confirmation:</label
+                    <Switch
+                        v-model="form.rememberMe"
+                        :class="form.rememberMe ? 'bg-blue-600' : 'bg-gray-200'"
+                        class="relative inline-flex h-6 w-11 items-center rounded-full"
                     >
-                    <input
-                        v-model="form.password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        id="password_confirmation"
-                        class="border-2 text-gray-900 border-gray-200 rounded-md p-2 w-full outline-0 focus:border-blue-500 transition"
-                        :class="{ '!border-red-500': form.errors.password_confirmation }"
-                    />
-                    <span
-                        class="text-red-500 font-medium"
-                        v-if="form.errors.password_confirmation"
-                        >{{ form.errors.password_confirmation }}</span
-                    >
+                        <span
+                            :class="form.rememberMe ? 'translate-x-6' : 'translate-x-1'"
+                            class="inline-block h-4 w-4 transform rounded-full bg-white transition"
+                        />
+                    </Switch>
                 </div>
 
                 <button
@@ -85,7 +72,7 @@
                     type="submit"
                     class="bg-blue-500 text-gray-100 font-roboto font-medium rounded-md p-2 w-full hover:bg-blue-400 transition cursor-pointer"
                 >
-                    Register
+                    Login
                 </button>
             </form>
         </div>
@@ -93,18 +80,26 @@
 </template>
 
 <script lang="ts" setup>
-import type { RegisterDto } from '#services/user_service'
-import { Head, useForm } from '@inertiajs/vue3'
+import type { LoginDto } from '#services/user_service'
+
+import { Switch } from '@headlessui/vue'
+import { Head, useForm, Link } from '@inertiajs/vue3'
 import Navigation from '~/components/nav.vue'
 
-const form = useForm<RegisterDto & { password_confirmation: string }>({
+const form = useForm<LoginDto>({
     email: '',
-    fullName: '',
     password: '',
-    password_confirmation: '',
+    rememberMe: false,
 })
 
 const submit = () => {
-    form.post('/register')
+    form.post('/login', {
+        onError: (params) => {
+            if (params.E_INVALID_CREDENTIALS) {
+                form.errors.email = 'Invalid email or password'
+                form.errors.password = 'Invalid email or password'
+            }
+        },
+    })
 }
 </script>
