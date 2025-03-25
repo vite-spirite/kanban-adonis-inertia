@@ -16,7 +16,7 @@ export default class RolePermission extends BaseModel {
     @column()
     declare allow: boolean
 
-    @belongsTo(() => ProjectRole)
+    @belongsTo(() => ProjectRole, { foreignKey: 'roleId' })
     declare role: BelongsTo<typeof ProjectRole>
 
     @column.dateTime({ autoCreate: true })

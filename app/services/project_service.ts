@@ -2,6 +2,7 @@ import type { MinimalProject } from '#types/project.dto'
 
 import User from '#models/user'
 import Project from '#models/project'
+import RolePermission from '#models/role_permission'
 
 export class ProjectService {
     async getAll(): Promise<Project[]> {
@@ -33,5 +34,16 @@ export class ProjectService {
             .preload('roles', (query) => query.preload('permissions').preload('users'))
             .where('id', id)
             .firstOrFail()
+    }
+
+    async findPermissionByUser(user: User, project: Project): Promise<RolePermission[]> {
+        const userRole = await user.related('roles').query().where('projectId', project.id)
+
+        const permissions = await RolePermission.query().whereIn(
+            'roleId',
+            userRole.map((role) => role.id)
+        )
+
+        return permissions
     }
 }

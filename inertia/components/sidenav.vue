@@ -83,6 +83,4 @@ import { Link } from '@inertiajs/vue3'
 import { PlusCircleIcon } from '@heroicons/vue/24/outline'
 
 const { projects } = defineProps<{ user: MeDto; projects: MinimalProject[] }>()
-
-console.log(projects)
 </script>

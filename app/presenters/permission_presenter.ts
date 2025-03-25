@@ -1,4 +1,5 @@
 import RolePermission from '#models/role_permission'
+import type { PermissionDto } from '#types/permission.dto'
 
 export class PermissionPresenter {
     declare id: number
@@ -9,7 +10,7 @@ export class PermissionPresenter {
 
     constructor(permission: RolePermission) {
         this.id = permission.id
-        this.name = permission.name
+        this.name = permission.permission
         this.allow = permission.allow
         this.createdAt = permission.createdAt.toISO() || ''
         this.updatedAt = permission.updatedAt.toISO() || ''

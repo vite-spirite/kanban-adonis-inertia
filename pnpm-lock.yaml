@@ -11,6 +11,9 @@ importers:
       '@adonisjs/auth':
         specifier: ^9.3.1
         version: 9.3.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1))(@adonisjs/lucid@21.6.1(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1))(@vinejs/vine@3.0.1)(luxon@3.5.0)(pg@8.14.1))(@adonisjs/session@7.5.1(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1))(edge.js@6.2.1))(@japa/plugin-adonisjs@4.0.0(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1))(@japa/runner@4.2.0))
+      '@adonisjs/bouncer':
+        specifier: ^3.1.5
+        version: 3.1.5(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1))(edge.js@6.2.1)
       '@adonisjs/core':
         specifier: ^6.17.2
         version: 6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1)
@@ -38,6 +41,9 @@ importers:
       '@headlessui/vue':
         specifier: ^1.7.23
         version: 1.7.23(vue@3.5.13(typescript@5.7.3))
+      '@heroicons/vue':
+        specifier: ^2.2.0
+        version: 2.2.0(vue@3.5.13(typescript@5.7.3))
       '@inertiajs/vue3':
         specifier: ^2.0.5
         version: 2.0.5(vue@3.5.13(typescript@5.7.3))
@@ -50,6 +56,9 @@ importers:
       '@vue/server-renderer':
         specifier: ^3.5.13
         version: 3.5.13(vue@3.5.13(typescript@5.7.3))
+      bouncer:
+        specifier: ^0.0.5
+        version: 0.0.5
       edge.js:
         specifier: ^6.2.1
         version: 6.2.1
@@ -173,6 +182,21 @@ packages:
     engines: {node: '>=18.16.0'}
     peerDependencies:
       '@adonisjs/http-server': ^7.4.0
+
+  '@adonisjs/bouncer@3.1.5':
+    resolution: {integrity: sha512-zgyuHUZeggPjCbcdjbLZl7qfykioLzFnxzAuZrLrvwrMeZhJ7aaYydJQtnGVZjMAAhymjP6JOa32fEd2bqdZZg==}
+    engines: {node: '>=18.16.0'}
+    peerDependencies:
+      '@adonisjs/core': ^6.17.1
+      '@adonisjs/i18n': ^2.2.0
+      edge.js: ^6.2.1
+    peerDependenciesMeta:
+      '@adonisjs/core':
+        optional: true
+      '@adonisjs/i18n':
+        optional: true
+      edge.js:
+        optional: true
 
   '@adonisjs/config@5.0.2':
     resolution: {integrity: sha512-NXjFqDHNGRTZ1EnA4zr20GFEt7qw/JvZ4ZV8/PzFyVc7dPoFprpoyE3bw7kmlKHhcQdBbF7YXCGB4q+HQUnqiQ==}
@@ -628,6 +652,11 @@ packages:
     engines: {node: '>=10'}
     peerDependencies:
       vue: ^3.2.0
+
+  '@heroicons/vue@2.2.0':
+    resolution: {integrity: sha512-G3dbSxoeEKqbi/DFalhRxJU4mTXJn7GwZ7ae8NuEQzd1bqdd0jAbdaBZlHPcvPD2xI1iGzNVB4k20Un2AguYPw==}
+    peerDependencies:
+      vue: '>= 3'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1339,6 +1368,16 @@ packages:
     resolution: {integrity: sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==}
     engines: {node: '>= 0.8'}
 
+  bouncer@0.0.5:
+    resolution: {integrity: sha512-+m9K4VXDyz/QYqTOZ+UIZ8/HI3MB8L4JTjHEUEuyJbOEWLEk4r8ymq/TH2IKr1Zd3GagCe4/m/ShZ1odrk9FuQ==}
+    engines: {node: 0.6.x}
+    hasBin: true
+
+  bouncy@1.3.1:
+    resolution: {integrity: sha512-yYzWdTlW9ZFLP4R7grgS8+TOpIWQS4f5K2lfs6y5lzkBHpi1Y89QLngAz3lkZY8Zl5VHmItIZjk6BmrryxDO0w==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
 
@@ -1458,6 +1497,10 @@ packages:
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
+
+  commander@0.6.0:
+    resolution: {integrity: sha512-Dk8oKrZqmQsosZ0OmnO3cOpHY4t22WfNnUA+wbLhkk+TQtbgbLx4D0ImkhwVXZikGJsmOzb5ZymtszUMU1+hNg==}
+    engines: {node: '>= 0.4.x < 0.7.0'}
 
   commander@10.0.1:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
@@ -2354,6 +2397,9 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
+  mdns@0.0.6:
+    resolution: {integrity: sha512-e47y2zA6rhfEJJQe7gJcECq5T9S/a++hBd/2SH1ebh9tNrhkd0YNsWNg2swq+pCOLWH/N5u0XwxU2mMBhln9Ug==}
+
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
     engines: {node: '>= 0.6'}
@@ -2409,6 +2455,9 @@ packages:
     resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
     engines: {node: '>=10'}
     hasBin: true
+
+  morestreams@0.0.2:
+    resolution: {integrity: sha512-pMj6w1TrFBVlU07v4AREdHCKaTSrRzLC/27iha9CT3hsLcyvIrnK5pfHy8Bx97DPlt5xw4iQKEhZ4AhF0gWJ7A==}
 
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
@@ -2546,6 +2595,10 @@ packages:
   parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
     engines: {node: '>= 0.8'}
+
+  parsley@0.1.0:
+    resolution: {integrity: sha512-vKHBwkqdTmWR1kwMyEYnrhvIeA1gSg6+PgyFmDH72D98TbiBN2Dbxkz4FSkT8vC3yIQZKNDqv557K51DknwHWQ==}
+    engines: {node: '>=0.4.0'}
 
   path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
@@ -3376,6 +3429,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@adonisjs/bouncer@3.1.5(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1))(edge.js@6.2.1)':
+    dependencies:
+      '@poppinss/utils': 6.9.2
+    optionalDependencies:
+      '@adonisjs/core': 6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))(@vinejs/vine@3.0.1)(edge.js@6.2.1)
+      edge.js: 6.2.1
+
   '@adonisjs/config@5.0.2':
     dependencies:
       '@poppinss/utils': 6.9.2
@@ -3790,6 +3850,10 @@ snapshots:
   '@headlessui/vue@1.7.23(vue@3.5.13(typescript@5.7.3))':
     dependencies:
       '@tanstack/vue-virtual': 3.13.4(vue@3.5.13(typescript@5.7.3))
+      vue: 3.5.13(typescript@5.7.3)
+
+  '@heroicons/vue@2.2.0(vue@3.5.13(typescript@5.7.3))':
+    dependencies:
       vue: 3.5.13(typescript@5.7.3)
 
   '@humanfs/core@0.19.1': {}
@@ -4480,6 +4544,17 @@ snapshots:
     dependencies:
       safe-buffer: 5.1.2
 
+  bouncer@0.0.5:
+    dependencies:
+      bouncy: 1.3.1
+      commander: 0.6.0
+      mdns: 0.0.6
+
+  bouncy@1.3.1:
+    dependencies:
+      morestreams: 0.0.2
+      parsley: 0.1.0
+
   brace-expansion@1.1.11:
     dependencies:
       balanced-match: 1.0.2
@@ -4594,6 +4669,8 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
+
+  commander@0.6.0: {}
 
   commander@10.0.1: {}
 
@@ -5416,6 +5493,8 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
+  mdns@0.0.6: {}
+
   media-typer@0.3.0: {}
 
   media-typer@1.1.0: {}
@@ -5454,6 +5533,8 @@ snapshots:
   minimist@1.2.8: {}
 
   mkdirp@3.0.1: {}
+
+  morestreams@0.0.2: {}
 
   ms@2.0.0: {}
 
@@ -5583,6 +5664,8 @@ snapshots:
   parse-ms@4.0.0: {}
 
   parseurl@1.3.3: {}
+
+  parsley@0.1.0: {}
 
   path-browserify@1.0.1: {}
 
