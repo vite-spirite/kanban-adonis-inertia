@@ -64,9 +64,11 @@
                 <li class="w-full">
                     <Link
                         href="/"
-                        class="inline-block w-full border-2 border-dashed border-gray-200 text-center hover:bg-blue-500 rounded-lg p-2 hover:text-gray-200 hover:border-transparent transition"
-                        >Create new project</Link
+                        class="inline-flex flex-row justify-center items-center space-x-2 w-full border-2 border-dashed border-gray-200 text-center hover:bg-blue-500 rounded-lg p-2 hover:text-gray-200 hover:border-transparent transition"
                     >
+                        <PlusCircleIcon class="w-6 h-6" />
+                        <span>Create new project</span>
+                    </Link>
                 </li>
             </ul>
         </div>
@@ -78,6 +80,7 @@ import type { MinimalProject } from '#types/project.dto'
 import type { MeDto } from '#types/user.dto'
 
 import { Link } from '@inertiajs/vue3'
+import { PlusCircleIcon } from '@heroicons/vue/24/outline'
 
 const { projects } = defineProps<{ user: MeDto; projects: MinimalProject[] }>()
 
