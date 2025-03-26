@@ -13,6 +13,7 @@ import { middleware } from '#start/kernel'
 const HomeController = () => import('#controllers/home_controller')
 const UserController = () => import('#controllers/users_controller')
 const DashboardController = () => import('#controllers/dashboard_controller')
+const ProjectController = () => import('#controllers/projects_controller')
 
 router.get('/', [HomeController, 'index']).as('home')
 
@@ -29,6 +30,8 @@ router
         router.get('/', [DashboardController, 'index']).as('dashboard.index')
 
         router.get('/projects/:id', [DashboardController, 'project']).as('dashboard.project')
+        router.get('/projects/:id/edit', [DashboardController, 'edit']).as('dashboard.edit')
+        router.put('/projects/:id', [ProjectController, 'update'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

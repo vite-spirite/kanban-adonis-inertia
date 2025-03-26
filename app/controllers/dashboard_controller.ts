@@ -42,4 +42,28 @@ export default class DashboardController {
             capabilities: capabilitiesPresenter,
         })
     }
+
+    async edit({ inertia, auth, response, params, bouncer }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().toRoute('login')
+        }
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project || (await bouncer.with(ProjectPolicy).denies('edit', project))) {
+            return response.redirect().back()
+        }
+
+        const projectPresenter = new ProjectPresenter(project)
+
+        const capabilities = await this.projectService.findPermissionByUser(auth.user, project)
+        const capabilitiesPresenter = capabilities.map(
+            (capability) => new PermissionPresenter(capability)
+        )
+
+        return inertia.render('dashboard/project_edit', {
+            project: projectPresenter.present(),
+            capabilities: capabilitiesPresenter.map((p) => p.present()),
+        })
+    }
 }

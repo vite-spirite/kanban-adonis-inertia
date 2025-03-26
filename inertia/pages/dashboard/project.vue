@@ -22,7 +22,7 @@
 import { usePage, Head, Link } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import { can } from '~/utils/can'
-import { Permissions } from '#policies/main'
+import { Permissions } from '~/utils/permission_enum'
 import type { InferPageProps } from '@adonisjs/inertia/types'
 import type DashboardController from '#controllers/dashboard_controller'
 

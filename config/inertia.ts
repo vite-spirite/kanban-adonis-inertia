@@ -1,4 +1,4 @@
-import type { MinimalProject } from '#types/project.dto'
+import type { MinimalProjectDto } from '#types/project.dto'
 import type { MeDto } from '#types/user.dto'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
 
@@ -19,7 +19,6 @@ const inertiaConfig = defineConfig({
     sharedData: {
         user: (ctx) =>
             ctx.inertia.always(() => {
-                console.log('reload user data')
                 if (ctx.auth.user) {
                     return new UserPresenter(ctx.auth.user).presentMe()
                 } else {
@@ -51,6 +50,6 @@ export default inertiaConfig
 declare module '@adonisjs/inertia/types' {
     export interface SharedProps extends InferSharedProps<typeof inertiaConfig> {
         user: MeDto | null
-        projects: MinimalProject[]
+        projects: MinimalProjectDto[]
     }
 }

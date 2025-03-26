@@ -1,6 +1,6 @@
 <template>
     <div
-        class="min-h-screen w-1/8 flex flex-col justify-start items-start overflow-y-auto bg-gray-100 rounded-r-2xl p-2 space-y-5"
+        class="min-h-screen w-1/4 xl:w-1/6 2xl:w-1/8 flex flex-col justify-start items-start overflow-y-auto bg-gray-100 rounded-r-2xl p-2 space-y-5"
     >
         <div class="pb-0 pt-4 w-full text-left px-2">
             <Link href="/">LOGO</Link>
@@ -76,11 +76,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { MinimalProject } from '#types/project.dto'
+import type { MinimalProjectDto } from '#types/project.dto'
 import type { MeDto } from '#types/user.dto'
 
 import { Link } from '@inertiajs/vue3'
 import { PlusCircleIcon } from '@heroicons/vue/24/outline'
 
-const { projects } = defineProps<{ user: MeDto; projects: MinimalProject[] }>()
+const { projects } = defineProps<{ user: MeDto; projects: MinimalProjectDto[] }>()
 </script>

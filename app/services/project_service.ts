@@ -1,8 +1,10 @@
-import type { MinimalProject } from '#types/project.dto'
+import type { MinimalProjectDto, ProjectEditDto } from '#types/project.dto'
 
 import User from '#models/user'
 import Project from '#models/project'
 import RolePermission from '#models/role_permission'
+import { cuid } from '@adonisjs/core/helpers'
+import drive from '@adonisjs/drive/services/main'
 
 export class ProjectService {
     async getAll(): Promise<Project[]> {
@@ -18,7 +20,7 @@ export class ProjectService {
         )
     }
 
-    async getMinimalUserProjects(user: User): Promise<MinimalProject[]> {
+    async getMinimalUserProjects(user: User): Promise<MinimalProjectDto[]> {
         const userRoles = await user.related('roles').query()
 
         return Project.query()
@@ -45,5 +47,29 @@ export class ProjectService {
         )
 
         return permissions
+    }
+
+    async update(project: Project, payload: ProjectEditDto): Promise<Project> {
+        if (payload.image) {
+            const key = `projects/icons/${cuid()}.${payload.image.extname}`
+
+            await payload.image.moveToDisk(key)
+
+            if (project.image) {
+                const disk = drive.use('fs')
+                const currentKey = project.image.replace('/uploads/', '/')
+
+                await disk.delete(currentKey)
+            }
+        }
+
+        project.merge({
+            ...payload,
+            image: payload.image ? payload.image.meta.url : project.image,
+        })
+
+        await project.save()
+
+        return project
     }
 }

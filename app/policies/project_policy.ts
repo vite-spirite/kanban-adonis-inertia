@@ -5,7 +5,7 @@ import Project from '#models/project'
 import { inject } from '@adonisjs/core'
 import { ProjectService } from '#services/project_service'
 
-import { Permissions as PermissionsType } from '#policies/main'
+import { Permissions as PermissionsType } from '#abilities/main'
 
 @inject()
 export default class ProjectPolicy extends BasePolicy {

@@ -14,10 +14,17 @@
 
 import { Bouncer } from '@adonisjs/bouncer'
 
+export enum Permissions {
+    PROJECT_EDIT = 'project:edit',
+    PROJECT_CREATE = 'project:create',
+    PROJECT_DELETE = 'project:delete',
+    PROJECT_READ = 'project:read',
+}
+
 /**
  * Delete the following ability to start from
  * scratch
  */
 export const editUser = Bouncer.ability(() => {
-  return true
+    return true
 })
