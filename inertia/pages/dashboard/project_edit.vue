@@ -48,7 +48,12 @@
                 <TabPanel class="w-full">
                     <ProjectEditGeneral :project="pageProps.project" />
                 </TabPanel>
-                <TabPanel class="w-full">Tab 2</TabPanel>
+                <TabPanel class="w-full">
+                    <ProjectEditRole
+                        :project="pageProps.project"
+                        :capabilities="pageProps.capabilities"
+                    />
+                </TabPanel>
                 <TabPanel class="w-full">Tab 3</TabPanel>
             </TabPanels>
         </TabGroup>
@@ -68,6 +73,7 @@ import { can } from '~/utils/can'
 import { Permissions } from '~/utils/permission_enum'
 
 import ProjectEditGeneral from '~/components/projects/editing/general.vue'
+import ProjectEditRole from '~/components/projects/editing/role.vue'
 
 const page = usePage<InferPageProps<DashboardController, 'edit'>>()
 const pageProps = computed(() => page.props)

@@ -10,7 +10,9 @@
             </div>
 
             <div class="px-4 py-6">
-                <Link href="/" v-if="can(pageProps.capabilities, Permissions.PROJECT_EDIT)"
+                <Link
+                    :href="`/dashboard/projects/${pageProps.project.id}/edit`"
+                    v-if="can(pageProps.capabilities, Permissions.PROJECT_EDIT)"
                     >Edit</Link
                 >
             </div>

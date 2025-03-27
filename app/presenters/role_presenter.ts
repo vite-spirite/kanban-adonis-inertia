@@ -6,6 +6,7 @@ import { UserPresenter } from '#presenters/user_presenter'
 export class RolePresenter {
     declare id: number
     declare name: string
+    declare editable: boolean
     declare createdAt: string
     declare updatedAt: string
 
@@ -15,6 +16,7 @@ export class RolePresenter {
     constructor(role: Role) {
         this.id = role.id
         this.name = role.name
+        this.editable = role.editable
         this.createdAt = role.createdAt.toISO() || ''
         this.updatedAt = role.updatedAt.toISO() || ''
 
@@ -33,6 +35,7 @@ export class RolePresenter {
         return {
             id: this.id,
             name: this.name,
+            editable: this.editable,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             permissions: this.permissions?.map((permission) => permission.present()),

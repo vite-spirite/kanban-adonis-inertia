@@ -1,6 +1,7 @@
 import Project from '#models/project'
 import type { ProjectDto } from '#types/project.dto'
 import { RolePresenter } from '#presenters/role_presenter'
+import { UserPresenter } from '#presenters/user_presenter'
 
 export class ProjectPresenter {
     declare id: number
@@ -10,6 +11,7 @@ export class ProjectPresenter {
     declare updatedAt: string
 
     declare roles?: RolePresenter[]
+    declare users?: UserPresenter[]
 
     constructor(project: Project) {
         this.id = project.id
@@ -20,6 +22,18 @@ export class ProjectPresenter {
 
         if (project.roles) {
             this.roles = project.roles.map((role) => new RolePresenter(role))
+
+            this.roles.map((role) => {
+                if (role.users) {
+                    role.users.map((user) => {
+                        if (!this.users) {
+                            this.users = []
+                        }
+
+                        this.users.push(user)
+                    })
+                }
+            })
         }
     }
 
@@ -31,6 +45,7 @@ export class ProjectPresenter {
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             roles: this.roles?.map((role) => role.present()),
+            users: this.users?.map((user) => user.present()),
         }
     }
 }

@@ -30,6 +30,9 @@ export default class ProjectRole extends BaseModel {
     })
     declare users: ManyToMany<typeof User>
 
+    @column()
+    declare editable: boolean
+
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime
 
