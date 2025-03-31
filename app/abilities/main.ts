@@ -22,6 +22,9 @@ export enum Permissions {
     PROJECT_ROLE_EDIT = 'project:role:edit',
     PROJECT_ROLE_CREATE = 'project:role:create',
     PROJECT_ROLE_DELETE = 'project:role:delete',
+    PROJECT_MEMBER_CREATE = 'project:member:create',
+    PROJECT_MEMBER_DELETE = 'project:member:delete',
+    PROJECT_MEMBER_EDIT = 'project:member:role:edit',
 }
 
 /**

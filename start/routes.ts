@@ -36,6 +36,8 @@ router
         router.post('/projects/:id/role', [ProjectController, 'createRole'])
         router.put('/projects/:id/role/:roleId', [ProjectController, 'updateRolePermission'])
         router.delete('/projects/:id/role/:roleId', [ProjectController, 'deleteRole'])
+
+        router.put('/projects/:id/members', [ProjectController, 'updateUserRoles'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

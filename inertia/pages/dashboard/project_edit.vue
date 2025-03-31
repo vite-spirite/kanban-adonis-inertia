@@ -25,7 +25,15 @@
                     </button>
                 </Tab>
 
-                <Tab as="template" v-slot="{ selected }">
+                <Tab
+                    as="template"
+                    v-slot="{ selected }"
+                    :disabled="
+                        !can(pageProps.capabilities, Permissions.PROJECT_ROLE_EDIT) &&
+                        !can(pageProps.capabilities, Permissions.PROJECT_ROLE_DELETE) &&
+                        !can(pageProps.capabilities, Permissions.PROJECT_ROLE_CREATE)
+                    "
+                >
                     <button
                         class="w-full hover:bg-gray-200 transition-all outline-0 py-4 rounded-lg cursor-pointer"
                         :class="{ 'bg-gray-200': selected, 'bg-transparent': !selected }"
@@ -54,7 +62,15 @@
                         :capabilities="pageProps.capabilities"
                     />
                 </TabPanel>
-                <TabPanel class="w-full">Tab 3</TabPanel>
+
+                <TabPanel class="w-full">
+                    <ProjectEditMembers
+                        :users="pageProps.project.users || []"
+                        :capabilities="pageProps.capabilities"
+                        :roles="pageProps.project.roles || []"
+                        :project="pageProps.project"
+                    />
+                </TabPanel>
             </TabPanels>
         </TabGroup>
     </div>
@@ -74,6 +90,7 @@ import { Permissions } from '~/utils/permission_enum'
 
 import ProjectEditGeneral from '~/components/projects/editing/general.vue'
 import ProjectEditRole from '~/components/projects/editing/role.vue'
+import ProjectEditMembers from '~/components/projects/editing/members.vue'
 
 const page = usePage<InferPageProps<DashboardController, 'edit'>>()
 const pageProps = computed(() => page.props)

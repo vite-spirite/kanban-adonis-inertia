@@ -5,6 +5,7 @@ import { ProjectService } from '#services/project_service'
 import { ProjectPresenter } from '#presenters/project_presenter'
 import { PermissionPresenter } from '#presenters/permission_presenter'
 import ProjectPolicy from '#policies/project_policy'
+import { ProjectDto } from '#types/project.dto'
 
 @inject()
 export default class DashboardController {
@@ -62,7 +63,7 @@ export default class DashboardController {
         )
 
         return inertia.render('dashboard/project_edit', {
-            project: projectPresenter.present(),
+            project: projectPresenter.present() as ProjectDto,
             capabilities: capabilitiesPresenter.map((p) => p.present()),
         })
     }

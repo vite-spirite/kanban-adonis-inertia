@@ -40,4 +40,12 @@ export default class ProjectPolicy extends BasePolicy {
             (perm) => perm.permission === PermissionsType.PROJECT_DELETE && perm.allow
         )
     }
+
+    async updateMemberRoles(user: User, project: Project): Promise<AuthorizerResponse> {
+        const permissions = await this.projectService.findPermissionByUser(user, project)
+
+        return !!permissions.find(
+            (perm) => perm.permission === PermissionsType.PROJECT_MEMBER_EDIT && perm.allow
+        )
+    }
 }

@@ -72,4 +72,18 @@ export class ProjectService {
 
         return project
     }
+
+    async updateUserRoles(
+        project: Project,
+        user: User,
+        payload: { id: number; allow: boolean }[]
+    ): Promise<void> {
+        const projectRoles = project.roles ?? (await project.related('roles').query())
+
+        const availableRoles = payload.filter((role) => projectRoles.find((r) => r.id === role.id))
+        const attachedRoles = availableRoles.filter((role) => role.allow).map((role) => role.id)
+
+        await user.related('roles').detach(projectRoles.map((role) => role.id))
+        await user.related('roles').attach(attachedRoles)
+    }
 }

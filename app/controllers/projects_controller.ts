@@ -4,12 +4,14 @@ import { inject } from '@adonisjs/core'
 import { ProjectService } from '#services/project_service'
 import { projectEdit } from '#validators/project'
 import { RoleService } from '#services/role_service'
-import { CreateRoleValidator, UpdateRoleValidator } from '#validators/role'
+import { CreateRoleValidator, UpdateRoleValidator, UpdateUserRoleValidator } from '#validators/role'
 import ProjectRolePolicy from '#policies/project_role_policy'
+import { UserService } from '#services/user_service'
 
 @inject()
 export default class ProjectsController {
     constructor(
+        private readonly userService: UserService,
         private readonly projectService: ProjectService,
         private readonly roleService: RoleService
     ) {}
@@ -107,6 +109,34 @@ export default class ProjectsController {
         await role.related('users').detach()
         await role.delete()
 
+        return response.redirect().back()
+    }
+
+    async updateUserRoles({ request, auth, bouncer, params, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const payload = await UpdateUserRoleValidator.validate(request.all())
+        console.log(payload)
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        const user = await this.userService.findById(payload.user_id)
+
+        if (!user) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ProjectPolicy).denies('updateMemberRoles', project)) {
+            return response.redirect().back()
+        }
+
+        await this.projectService.updateUserRoles(project, user, payload.roles)
         return response.redirect().back()
     }
 }

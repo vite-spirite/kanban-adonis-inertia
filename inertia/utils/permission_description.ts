@@ -27,4 +27,16 @@ export const PermissionDescription: Record<string, { title: string; description:
         title: 'Delete role',
         description: 'Delete a role',
     },
+    'project:member:create': {
+        title: 'Add member',
+        description: 'Add a new member to the project',
+    },
+    'project:member:delete': {
+        title: 'Remove member',
+        description: 'Remove a member from the project',
+    },
+    'project:member:role:edit': {
+        title: 'Edit member role',
+        description: 'Edit member role permissions',
+    },
 }

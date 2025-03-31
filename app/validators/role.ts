@@ -17,3 +17,15 @@ export const UpdateRoleValidator = vine.compile(
         ),
     })
 )
+
+export const UpdateUserRoleValidator = vine.compile(
+    vine.object({
+        user_id: vine.number(),
+        roles: vine.array(
+            vine.object({
+                id: vine.number(),
+                allow: vine.boolean(),
+            })
+        ),
+    })
+)
