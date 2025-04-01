@@ -133,7 +133,7 @@ export class ProjectService {
         payload: { id: number; allow: boolean }[]
     ): Promise<void> {
         const projectRoles = project.roles ?? (await project.related('roles').query())
-        const projectRoleIds = projectRoles.map((role) => role.id)
+        const projectRoleIds = projectRoles.filter((r) => r.editable).map((role) => role.id)
 
         const allowedRoleIds = this.filterAllowedRoles(projectRoles, payload)
 

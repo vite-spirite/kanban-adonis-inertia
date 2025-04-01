@@ -14,7 +14,13 @@
                     {{ findRoleById(role.id)?.name }}
                 </h3>
 
-                <Switch v-model="role.allow" as="template" v-slot="{ checked }">
+                <Switch
+                    v-model="role.allow"
+                    as="template"
+                    v-slot="{ checked }"
+                    :disabled="findRoleById(role.id)?.editable == false"
+                    class="disabled:cursor-not-allowed"
+                >
                     <button
                         class="relative inline-flex h-6 w-11 items-center rounded-full"
                         :class="checked ? 'bg-blue-600' : 'bg-gray-200'"
