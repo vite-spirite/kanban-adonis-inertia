@@ -15,4 +15,5 @@
 
 body {
 	font-family: var(--font-roboto);
+	overflow: hidden
 }

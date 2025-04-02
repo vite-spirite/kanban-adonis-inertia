@@ -1,179 +1,143 @@
 <template>
-    <div class="w-full flex flex-col justify-start items-start space-y-2">
-        <div class="bg-gray-200 rounded-lg px-4 py-6 w-full">
-            <h1 class="text-xl font-medium">{{ role.name }}:</h1>
+    <div class="w-full">
+        <RoleDeleteConfirmDialog
+            :is-open="dialogDelete"
+            @close="dialogDelete = false"
+            :role-id="role.id"
+            :project-id="projectId"
+        />
+
+        <div class="h-full flex flex-row justify-between items-center">
+            <h2 class="text-2xl font-semibold text-gray-800">{{ role.name }}</h2>
+
+            <div class="flex flex-row justify-end items-center space-x-4">
+                <button
+                    :disabled="!allowDelete || !role.editable"
+                    @click="dialogDelete = true"
+                    class="font-medium bg-red-400 hover:bg-red-600 transition text-gray-100 rounded-lg p-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <TrashIcon class="size-4" />
+                </button>
+
+                <button
+                    :disabled="!isFormChanged || !role.editable || !allowEdit"
+                    @click="submit"
+                    class="font-medium bg-green-400 hover:bg-green-600 transition text-gray-100 rounded-lg p-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <CheckIcon class="size-4" />
+                </button>
+            </div>
         </div>
 
-        <div
-            class="flex flex-col justify-start items-start space-x-2 divide-y divide-gray-200 w-full"
-        >
+        <!--<div class="h-[2px] w-full bg-gray-200 block my-4"></div>-->
+
+        <div class="flex flex-col justify-start items-start w-full pt-6 divide-y divide-gray-200">
             <div
-                class="flex flex-row justify-between items-center w-full p-4"
-                v-for="item in Object.values(Permissions)"
-                :key="'role_' + role.id + '_permission_' + item"
+                class="flex flex-row justify-between items-center py-4 w-full"
+                v-for="(permission, index) in permissionForm.permissions"
+                :key="`role_${role.id}_permission_${permission.name}`"
             >
                 <div class="flex flex-col justify-start items-start space-y-2">
-                    <h1 class="font-medium text-xl leading-tight text-gray-950">
-                        {{ PermissionDescription[item].title }}
+                    <h1 class="text-xl text-neutral-900">
+                        {{ PermissionDescription[permission.name].title }}
                     </h1>
-                    <h3 class="font-medium text-gray-700">
-                        {{ PermissionDescription[item].description }}
-                    </h3>
+
+                    <span class="text-md text-neutral-500">
+                        {{ PermissionDescription[permission.name].description }}
+                    </span>
                 </div>
 
                 <Switch
+                    v-model="permission.allow"
                     :disabled="!role.editable"
-                    :default-checked="isChecked(item)"
-                    as="template"
-                    v-slot="{ checked }"
-                    @update:model-value="handleChecked(item)"
-                    class="disabled:cursor-not-allowed"
+                    :class="permission.allow ? 'bg-green-500' : 'bg-gray-200'"
+                    class="relative inline-flex h-6 w-11 items-center rounded-full"
                 >
-                    <button
-                        class="relative inline-flex h-6 w-11 items-center rounded-full"
-                        :class="checked ? 'bg-blue-600' : 'bg-gray-200'"
-                    >
-                        <span class="sr-only">Enable notifications</span>
-                        <span
-                            :class="checked ? 'translate-x-6' : 'translate-x-1'"
-                            class="inline-block h-4 w-4 transform rounded-full bg-white transition"
-                        />
-                    </button>
+                    <span
+                        :class="permission.allow ? 'translate-x-6' : 'translate-x-1'"
+                        class="inline-block h-4 w-4 transform rounded-full bg-white transition"
+                    />
                 </Switch>
             </div>
         </div>
 
-        <div class="w-full flex flex-row justify-end items-center space-x-2">
+        <div class="flex flex-row justify-end items-center w-full">
             <button
-                :disabled="!allowDelete || !role.editable"
-                @click.prevent="deleteDialogShow = true"
-                class="py-2 px-6 border-red-200 rounded-lg border-2 border-dashed hover:bg-red-500 focus:outline-none hover:border-transparent transition hover:text-gray-50 font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="!isFormChanged || !role.editable || !allowEdit"
+                class="text-sm font-medium bg-green-100 hover:bg-green-200 text-green-900 rounded-lg px-4 py-2 cursor-pointer transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                @click="submit"
             >
-                Delete role
-            </button>
-
-            <button
-                :disabled="form.permissions.length <= 0 || !allowEdit || !role.editable"
-                @click.prevent="submit"
-                class="py-2 px-6 border-gray-200 rounded-lg border-2 border-dashed hover:bg-blue-500 focus:outline-none hover:border-transparent transition hover:text-gray-50 font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                Save changes
+                <span>Save role</span>
             </button>
         </div>
     </div>
-
-    <Dialog
-        :open="deleteDialogShow"
-        @close="deleteDialogShow = !deleteDialogShow"
-        class="relative z-50"
-    >
-        <div class="fixed inset-0 flex w-screen items-center justify-center p-4 bg-black/30">
-            <DialogPanel
-                class="w-full max-w-sm rounded bg-white p-4 flex flex-col justify-start items-start space-y-2"
-            >
-                <DialogTitle class="text-xl">Delete {{ role.name }}:</DialogTitle>
-
-                <p>
-                    Are you sure you want to delete the role {{ role.name }}? This action cannot be
-                    undone.
-                </p>
-
-                <div class="flex flex-row justify-end items-center space-x-2 w-full">
-                    <button
-                        class="bg-red-500 text-gray-100 font-medium hover:bg-red-400 hover:text-gray-50 cursor-pointer px-4 py-2 rounded-md transition"
-                        @click.prevent="submitDelete"
-                    >
-                        Delete
-                    </button>
-                    <button
-                        class="bg-blue-500 text-gray-100 font-medium hover:bg-blue-400 hover:text-gray-50 cursor-pointer px-4 py-2 rounded-md transition"
-                        @click="deleteDialogShow = !deleteDialogShow"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </DialogPanel>
-        </div>
-    </Dialog>
 </template>
 
 <script lang="ts" setup>
 import type { RoleDto } from '#types/role.dto'
+import { ref, toRaw, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { Permissions } from '~/utils/permission_enum'
 import { PermissionDescription } from '~/utils/permission_description'
-import { Dialog, DialogPanel, DialogTitle, Switch } from '@headlessui/vue'
-import { ref } from 'vue'
 
-const deleteDialogShow = ref(false)
-const { role, projectId, allowDelete } = defineProps<{
+import { Switch } from '@headlessui/vue'
+import { CheckIcon, TrashIcon } from '@heroicons/vue/24/solid'
+import RoleDeleteConfirmDialog from '~/components/projects/editing/role_delete_confirm_dialog.vue'
+
+const { role, projectId } = defineProps<{
     role: RoleDto
     projectId: number
-    allowEdit: boolean
     allowDelete: boolean
+    allowEdit: boolean
 }>()
 
-const form = useForm<{ permissions: { name: string; allow: boolean }[] }>({ permissions: [] })
-const deleteFrom = useForm<{}>({})
+const dialogDelete = ref(false)
 
-const handleChecked = (name: string) => {
-    if (!role.editable) return
+const permissionForm = useForm<{ permissions: { name: string; allow: boolean }[] }>({
+    permissions: [],
+})
+const baseFormValue = ref<{ name: string; allow: boolean }[]>([])
+const isFormChanged = ref(false)
 
-    const updated = form.permissions.find((p) => p.name == name)
+const getRolePermissionByName = (name: Permissions | string) => {
+    const permission = role.permissions?.find((perm) => perm.name == name)
+    return permission
+}
 
-    if (updated) {
-        updated.allow = !updated.allow
-        return
-    }
+const initialValue = () => {
+    baseFormValue.value = []
+    permissionForm.permissions = []
 
-    if (!role.permissions) {
-        return
-    }
+    Object.values(Permissions).forEach((permission) => {
+        const baseValue = getRolePermissionByName(permission)
 
-    const defaultAllow = role.permissions.find((p) => p.name == name)
-
-    if (!defaultAllow) {
-        form.permissions.push({
-            name: name,
-            allow: true,
+        permissionForm.permissions.push({
+            name: permission,
+            allow: baseValue.allow ?? false,
         })
 
-        return
-    }
-
-    form.permissions.push({
-        name: name,
-        allow: !defaultAllow.allow,
+        baseFormValue.value.push({
+            name: permission,
+            allow: baseValue.allow ?? false,
+        })
     })
 }
 
-const isChecked = (name: string) => {
-    let permission = form.permissions.find((p) => p.name == name)
-
-    if (!permission) {
-        if (role.permissions) {
-            permission = role.permissions.find((p) => p.name == name)
-        }
-    }
-
-    if (!permission) {
-        return false
-    }
-
-    return permission.allow
-}
-
 const submit = () => {
-    form.put(`/dashboard/projects/${projectId}/role/${role.id}`, {
+    permissionForm.put(`/dashboard/projects/${projectId}/role/${role.id}`, {
         onSuccess: () => {
-            form.reset()
+            permissionForm.reset()
+            initialValue()
         },
     })
 }
 
-const submitDelete = () => {
-    if (allowDelete) {
-        deleteFrom.delete(`/dashboard/projects/${projectId}/role/${role.id}`)
-    }
-}
+watch(permissionForm, (value) => {
+    const _baseFormValue = toRaw(baseFormValue.value)
+    const _value = toRaw(value.permissions)
+
+    isFormChanged.value = JSON.stringify(_baseFormValue) != JSON.stringify(_value)
+})
+
+initialValue()
 </script>

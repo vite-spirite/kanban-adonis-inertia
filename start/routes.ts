@@ -30,7 +30,16 @@ router
         router.get('/', [DashboardController, 'index']).as('dashboard.index')
 
         router.get('/projects/:id', [DashboardController, 'project']).as('dashboard.project')
+
         router.get('/projects/:id/edit', [DashboardController, 'edit']).as('dashboard.edit')
+        router
+            .get('/projects/:id/edit/roles', [DashboardController, 'roles'])
+            .as('dashboard.edit.roles')
+
+        router
+            .get('/projects/:id/edit/members', [DashboardController, 'members'])
+            .as('dashboard.edit.members')
+
         router.put('/projects/:id', [ProjectController, 'update'])
 
         router.post('/projects/:id/role', [ProjectController, 'createRole'])

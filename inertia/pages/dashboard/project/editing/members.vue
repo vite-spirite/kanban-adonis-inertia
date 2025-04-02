@@ -1,24 +1,19 @@
 <template>
-    <Head :title="pageProps.project.name" />
+    <Head title="Edit project" />
 
-    <div class="w-full">
+    <div class="w-full h-full">
         <ProjectHeader :project="pageProps.project" :capabilities="pageProps.capabilities" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { usePage, Head, Link } from '@inertiajs/vue3'
-import { computed } from 'vue'
-import { QueueListIcon } from '@heroicons/vue/24/solid'
-import { can } from '~/utils/can'
-import { Permissions } from '~/utils/permission_enum'
 import type { InferPageProps } from '@adonisjs/inertia/types'
 import type DashboardController from '#controllers/dashboard_controller'
 
+import { Head, usePage } from '@inertiajs/vue3'
 import ProjectHeader from '~/components/projects/header.vue'
+import { computed } from 'vue'
 
-const page = usePage<InferPageProps<DashboardController, 'project'>>()
+const page = usePage<InferPageProps<DashboardController, 'members'>>()
 const pageProps = computed(() => page.props)
-
-console.log(pageProps.value)
 </script>

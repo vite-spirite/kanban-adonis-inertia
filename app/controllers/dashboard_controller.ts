@@ -62,7 +62,55 @@ export default class DashboardController {
             (capability) => new PermissionPresenter(capability)
         )
 
-        return inertia.render('dashboard/project_edit', {
+        return inertia.render('dashboard/project/editing/general', {
+            project: projectPresenter.present() as ProjectDto,
+            capabilities: capabilitiesPresenter.map((p) => p.present()),
+        })
+    }
+
+    async roles({ inertia, auth, response, params, bouncer }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().toRoute('login')
+        }
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project || (await bouncer.with(ProjectPolicy).denies('edit', project))) {
+            return response.redirect().back()
+        }
+
+        const projectPresenter = new ProjectPresenter(project)
+
+        const capabilities = await this.projectService.findPermissionByUser(auth.user, project)
+        const capabilitiesPresenter = capabilities.map(
+            (capability) => new PermissionPresenter(capability)
+        )
+
+        return inertia.render('dashboard/project/editing/roles', {
+            project: projectPresenter.present() as ProjectDto,
+            capabilities: capabilitiesPresenter.map((p) => p.present()),
+        })
+    }
+
+    async members({ inertia, auth, response, params, bouncer }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().toRoute('login')
+        }
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project || (await bouncer.with(ProjectPolicy).denies('edit', project))) {
+            return response.redirect().back()
+        }
+
+        const projectPresenter = new ProjectPresenter(project)
+
+        const capabilities = await this.projectService.findPermissionByUser(auth.user, project)
+        const capabilitiesPresenter = capabilities.map(
+            (capability) => new PermissionPresenter(capability)
+        )
+
+        return inertia.render('dashboard/project/editing/members', {
             project: projectPresenter.present() as ProjectDto,
             capabilities: capabilitiesPresenter.map((p) => p.present()),
         })

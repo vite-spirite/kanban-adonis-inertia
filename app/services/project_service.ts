@@ -99,7 +99,10 @@ export class ProjectService {
      * Update project information
      */
     async update(project: Project, payload: ProjectEditDto): Promise<Project> {
+        console.log(payload)
         const imageUrl = await this.handleImageUpload(project, payload.image)
+
+        console.log(payload)
 
         project.merge({
             ...payload,
