@@ -1,10 +1,17 @@
-import type User from '#models/user'
-
-export type MeDto = Pick<User, 'id' | 'fullName' | 'email' | 'createdAt' | 'updatedAt'>
+import type { InviteDto } from '#types/invite.dto'
 
 export type UserDto = {
     id: number
     fullName: string
     createdAt: string
     updatedAt: string
+}
+
+export type MeDto = {
+    id: number
+    fullName: string
+    email: string
+    createdAt: string
+    updatedAt: string
+    invites: InviteDto[]
 }

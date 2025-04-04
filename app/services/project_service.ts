@@ -5,6 +5,8 @@ import Project from '#models/project'
 import RolePermission from '#models/role_permission'
 import { cuid } from '@adonisjs/core/helpers'
 import drive from '@adonisjs/drive/services/main'
+import encryption from '@adonisjs/core/services/encryption'
+import ProjectInvite from '#models/project_invite'
 
 export class ProjectService {
     /**
@@ -59,6 +61,7 @@ export class ProjectService {
     async findById(id: number): Promise<Project> {
         return Project.query()
             .preload('roles', (query) => query.preload('permissions').preload('users'))
+            .preload('invites', (q) => q.preload('user'))
             .where('id', id)
             .firstOrFail()
     }
@@ -121,7 +124,7 @@ export class ProjectService {
         rolePayload: { id: number; allow: boolean }[]
     ): number[] {
         const availableRoles = rolePayload.filter((role) =>
-            projectRoles.find((r) => r.id === role.id)
+            projectRoles.find((r) => r.id === role.id && r.editable)
         )
 
         return availableRoles.filter((role) => role.allow).map((role) => role.id)
@@ -143,5 +146,25 @@ export class ProjectService {
         // Detach all project roles and attach allowed ones
         await user.related('roles').detach(projectRoleIds)
         await user.related('roles').attach(allowedRoleIds)
+    }
+
+    async createInvite(project: Project, payload: any, user?: User): Promise<void> {
+        const hashed = encryption.encrypt({
+            project: project.id,
+            roles: payload.roles,
+        })
+
+        const invite = await ProjectInvite.create({
+            email: payload.email,
+            token: hashed,
+            projectId: project.id,
+            userId: user?.id,
+        })
+
+        return
+    }
+
+    async findInviteByToken(token: string): Promise<ProjectInvite | null> {
+        return ProjectInvite.query().where('token', token).first()
     }
 }

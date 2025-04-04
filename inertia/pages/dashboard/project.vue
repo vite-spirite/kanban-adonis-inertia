@@ -7,11 +7,8 @@
 </template>
 
 <script lang="ts" setup>
-import { usePage, Head, Link } from '@inertiajs/vue3'
+import { usePage, Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import { QueueListIcon } from '@heroicons/vue/24/solid'
-import { can } from '~/utils/can'
-import { Permissions } from '~/utils/permission_enum'
 import type { InferPageProps } from '@adonisjs/inertia/types'
 import type DashboardController from '#controllers/dashboard_controller'
 

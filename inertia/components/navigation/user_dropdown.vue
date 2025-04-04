@@ -50,6 +50,28 @@
                         class="w-full py-2 text-neutral-800 font-medium text-left px-2 rounded-lg"
                     >
                         <a
+                            :class="{ 'bg-blue-500 !text-gray-100': active }"
+                            class="w-full inline-flex items-start justify-start space-x-2 transition-all"
+                            href="/dashboard/invites"
+                        >
+                            <div class="flex-1 flex flex-start items-center space-x-2">
+                                <EnvelopeIcon class="size-5" />
+                                <span>Invitations</span>
+                            </div>
+
+                            <span
+                                v-if="user.invites.length > 0"
+                                class="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-blue-100 bg-blue-600 rounded-full"
+                            >
+                                {{ user.invites.length }}
+                            </span>
+                        </a>
+                    </MenuItem>
+                    <MenuItem
+                        v-slot="{ active }"
+                        class="w-full py-2 text-neutral-800 font-medium text-left px-2 rounded-lg"
+                    >
+                        <a
                             :class="{ 'bg-red-500 !text-gray-100': active }"
                             class="w-full inline-flex items-start justify-start space-x-2 transition-all"
                             href="/logout"
@@ -69,6 +91,7 @@ import {
     ArrowUturnLeftIcon,
     ChevronDownIcon,
     Cog6ToothIcon,
+    EnvelopeIcon,
     PlusIcon,
 } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'

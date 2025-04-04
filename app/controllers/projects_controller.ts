@@ -7,6 +7,8 @@ import { RoleService } from '#services/role_service'
 import { CreateRoleValidator, UpdateRoleValidator, UpdateUserRoleValidator } from '#validators/role'
 import ProjectRolePolicy from '#policies/project_role_policy'
 import { UserService } from '#services/user_service'
+import { CreateInviteValidator } from '#validators/invite'
+import encryption from '@adonisjs/core/services/encryption'
 
 @inject()
 export default class ProjectsController {
@@ -118,7 +120,6 @@ export default class ProjectsController {
         }
 
         const payload = await UpdateUserRoleValidator.validate(request.all())
-        console.log(payload)
 
         const project = await this.projectService.findById(params.id)
 
@@ -137,6 +138,89 @@ export default class ProjectsController {
         }
 
         await this.projectService.updateUserRoles(project, user, payload.roles)
+        return response.redirect().back()
+    }
+
+    async createInvite({ auth, bouncer, request, response, params }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ProjectPolicy).denies('invite', project)) {
+            return response.redirect().back()
+        }
+
+        const payload = await CreateInviteValidator.validate(request.all())
+        const user = await this.userService.findByEmail(payload.email)
+
+        await this.projectService.createInvite(project, payload, user ?? undefined)
+        return response.redirect().back()
+    }
+
+    async acceptInvite({ request, response, params, auth }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const invite = await this.projectService.findInviteByToken(params.token)
+
+        if (!invite) {
+            return response.redirect().back()
+        }
+
+        if (invite.userId !== auth.user.id) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(invite.projectId)
+
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        const invitePayload = encryption.decrypt<{
+            projectId: number
+            roles: { id: number; allow: boolean }[]
+        }>(invite.token)
+
+        if (!invitePayload) {
+            return response.redirect().back()
+        }
+
+        await this.projectService.updateUserRoles(project, auth.user, invitePayload.roles)
+
+        await invite.delete()
+
+        return response.redirect().toRoute('dashboard.index')
+    }
+
+    async removeInvite({ response, params, auth, bouncer }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ProjectPolicy).denies('deleteInvite', project)) {
+            return response.redirect().back()
+        }
+
+        const invite = await project.related('invites').query().where('id', params.inviteId).first()
+        if (!invite) {
+            return response.redirect().back()
+        }
+
+        await invite.delete()
         return response.redirect().back()
     }
 }

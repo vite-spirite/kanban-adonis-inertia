@@ -2,7 +2,7 @@
     <div
         class="flex flex-col justify-start items-start space-y-4 border border-gray-200 rounded-lg p-4"
     >
-        <h1 class="text-2xl font-bold text-xl font-open-sans">{{ user.fullName }}</h1>
+        <h1 class="text-xl font-bold font-open-sans">{{ user.fullName }}</h1>
 
         <div class="flex flex-col justify-start items-start w-full divide-y divide-gray-200">
             <div
@@ -23,7 +23,7 @@
                 >
                     <button
                         class="relative inline-flex h-6 w-11 items-center rounded-full"
-                        :class="checked ? 'bg-blue-600' : 'bg-gray-200'"
+                        :class="checked ? 'bg-green-600' : 'bg-gray-200'"
                     >
                         <span class="sr-only">Enable notifications</span>
                         <span

@@ -47,6 +47,12 @@ router
         router.delete('/projects/:id/role/:roleId', [ProjectController, 'deleteRole'])
 
         router.put('/projects/:id/members', [ProjectController, 'updateUserRoles'])
+        router.post('/projects/:id/member', [ProjectController, 'createInvite'])
+        router.delete('/projects/:id/invites/:inviteId', [ProjectController, 'removeInvite'])
+
+        router.get('/invites', [UserController, 'showInvite'])
+        router.get('/invites/:token', [ProjectController, 'acceptInvite'])
+        router.get('/invites/:token/reject', [UserController, 'rejectInvite'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

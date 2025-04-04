@@ -1,4 +1,5 @@
 import User from '#models/user'
+import ProjectInvite from '#models/project_invite'
 
 /**
  * Data transfer object for user registration
@@ -80,5 +81,17 @@ export class UserService {
      */
     private async findByField(field: string, value: any): Promise<User | null> {
         return User.query().where(field, value).first()
+    }
+
+    async updateAllInviteByEmail(email: string, id: number): Promise<ProjectInvite[]> {
+        return ProjectInvite.query().where('email', email).update({ userId: id })
+    }
+
+    async findInviteByUser(user: User): Promise<ProjectInvite[]> {
+        return user.related('invites').query().preload('project')
+    }
+
+    async findInviteByToken(token: string): Promise<ProjectInvite | null> {
+        return ProjectInvite.query().where('token', token).first()
     }
 }

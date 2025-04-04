@@ -16,7 +16,10 @@ export default class UsersController {
             return response.redirect().back()
         }
 
+        await this.userService.updateAllInviteByEmail(user.email, user.id)
+
         await auth.use('web').login(user, false)
+
         return response.redirect().toRoute('home')
     }
 
@@ -41,5 +44,31 @@ export default class UsersController {
     async logout({ response, auth }: HttpContext) {
         await auth.use('web').logout()
         return response.redirect().toRoute('home')
+    }
+
+    async showInvite({ response, inertia, auth }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        return inertia.render('dashboard/invites', {
+            invites: await this.userService.findInviteByUser(auth.user),
+        })
+    }
+
+    async rejectInvite({ response, params, auth }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const token = params.token
+
+        const invite = await this.userService.findInviteByToken(token)
+        if (!invite || invite.userId !== auth.user.id) {
+            return response.redirect().back()
+        }
+
+        await invite.delete()
+        return response.redirect().back()
     }
 }

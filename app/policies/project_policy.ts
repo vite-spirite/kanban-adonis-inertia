@@ -48,4 +48,20 @@ export default class ProjectPolicy extends BasePolicy {
             (perm) => perm.permission === PermissionsType.PROJECT_MEMBER_EDIT && perm.allow
         )
     }
+
+    async invite(user: User, project: Project): Promise<AuthorizerResponse> {
+        const permissions = await this.projectService.findPermissionByUser(user, project)
+
+        return !!permissions.find(
+            (perm) => perm.permission === PermissionsType.PROJECT_MEMBER_CREATE && perm.allow
+        )
+    }
+
+    async deleteInvite(user: User, project: Project): Promise<AuthorizerResponse> {
+        const permissions = await this.projectService.findPermissionByUser(user, project)
+
+        return !!permissions.find(
+            (perm) => perm.permission === PermissionsType.PROJECT_MEMBER_DELETE && perm.allow
+        )
+    }
 }

@@ -18,8 +18,10 @@ const inertiaConfig = defineConfig({
      */
     sharedData: {
         user: (ctx) =>
-            ctx.inertia.always(() => {
+            ctx.inertia.always(async () => {
                 if (ctx.auth.user) {
+                    await ctx.auth.user.load('invites')
+
                     return new UserPresenter(ctx.auth.user).presentMe()
                 } else {
                     return null

@@ -1,5 +1,6 @@
 import User from '#models/user'
 import type { MeDto, UserDto } from '#types/user.dto'
+import { InvitePresenter } from '#presenters/invite_presenter'
 
 export class UserPresenter {
     declare id: number
@@ -8,12 +9,20 @@ export class UserPresenter {
     declare createdAt: string
     declare updatedAt: string
 
+    declare invites: InvitePresenter[]
+
     constructor(user: User) {
         this.id = user.id
-        this.fullName = user.fullName
+        this.fullName = user.fullName || ''
         this.email = user.email
         this.createdAt = user.createdAt.toISO() || ''
-        this.updatedAt = user.updatedAt.toISO() || ''
+        this.updatedAt = user.updatedAt?.toISO() || ''
+
+        this.invites = []
+
+        if (user.invites) {
+            this.invites = user.invites.map((invite) => new InvitePresenter(invite))
+        }
     }
 
     present(): UserDto {
@@ -32,6 +41,7 @@ export class UserPresenter {
             email: this.email,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
+            invites: this.invites.map((invite) => invite.present()),
         }
     }
 }
