@@ -33,7 +33,7 @@ export const PermissionDescription: Record<string, { title: string; description:
     },
     'project:member:delete': {
         title: 'Remove member',
-        description: 'Remove a member from the project',
+        description: 'Remove a member or invite from the project',
     },
     'project:member:role:edit': {
         title: 'Edit member role',

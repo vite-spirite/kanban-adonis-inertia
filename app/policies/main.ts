@@ -13,6 +13,6 @@
 */
 
 export const policies = {
-  ProjectRolePolicy: () => import('#policies/project_role_policy'),
-  ProjectPolicy: () => import('#policies/project_policy'),
+    ProjectRolePolicy: () => import('#policies/project_role_policy'),
+    ProjectPolicy: () => import('#policies/project_policy'),
 }
