@@ -113,12 +113,12 @@ const initialValue = () => {
 
         permissionForm.permissions.push({
             name: permission,
-            allow: baseValue.allow ?? false,
+            allow: baseValue?.allow ?? false,
         })
 
         baseFormValue.value.push({
             name: permission,
-            allow: baseValue.allow ?? false,
+            allow: baseValue?.allow ?? false,
         })
     })
 }
