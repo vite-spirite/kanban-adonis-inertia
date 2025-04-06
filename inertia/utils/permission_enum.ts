@@ -9,4 +9,8 @@ export enum Permissions {
     PROJECT_MEMBER_CREATE = 'project:member:create',
     PROJECT_MEMBER_DELETE = 'project:member:delete',
     PROJECT_MEMBER_EDIT = 'project:member:role:edit',
+    PROJECT_CATEGORY_CREATE = 'project:category:create',
+    PROJECT_CATEGORY_DELETE = 'project:category:delete',
+    PROJECT_CATEGORY_EDIT = 'project:category:edit',
+    PROJECT_CATEGORY_ORDER = 'project:category:order',
 }

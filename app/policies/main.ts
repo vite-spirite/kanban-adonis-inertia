@@ -13,6 +13,7 @@
 */
 
 export const policies = {
+    ProjectCategoryPolicy: () => import('#policies/project_category_policy'),
     ProjectRolePolicy: () => import('#policies/project_role_policy'),
     ProjectPolicy: () => import('#policies/project_policy'),
 }

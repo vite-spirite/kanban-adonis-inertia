@@ -47,7 +47,7 @@
 import { Link, usePage, Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import type { InferPageProps } from '@adonisjs/inertia/types'
-import UsersController from '#controllers/users_controller'
+import type UsersController from '#controllers/users_controller'
 
 import { DateTime } from 'luxon'
 

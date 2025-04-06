@@ -62,6 +62,7 @@ export class ProjectService {
         return Project.query()
             .preload('roles', (query) => query.preload('permissions').preload('users'))
             .preload('invites', (q) => q.preload('user'))
+            .preload('categories', (q) => q.orderBy('order', 'asc'))
             .where('id', id)
             .firstOrFail()
     }
@@ -148,20 +149,18 @@ export class ProjectService {
         await user.related('roles').attach(allowedRoleIds)
     }
 
-    async createInvite(project: Project, payload: any, user?: User): Promise<void> {
+    async createInvite(project: Project, payload: any, user?: User): Promise<ProjectInvite> {
         const hashed = encryption.encrypt({
             project: project.id,
             roles: payload.roles,
         })
 
-        const invite = await ProjectInvite.create({
+        return ProjectInvite.create({
             email: payload.email,
             token: hashed,
             projectId: project.id,
             userId: user?.id,
         })
-
-        return
     }
 
     async findInviteByToken(token: string): Promise<ProjectInvite | null> {

@@ -3,6 +3,7 @@ import type { ProjectDto } from '#types/project.dto'
 import { RolePresenter } from '#presenters/role_presenter'
 import { UserPresenter } from '#presenters/user_presenter'
 import { InvitePresenter } from '#presenters/invite_presenter'
+import { CategoryPresenter } from '#presenters/category_presenter'
 
 export class ProjectPresenter {
     declare id: number
@@ -14,6 +15,7 @@ export class ProjectPresenter {
     declare roles?: RolePresenter[]
     declare users?: UserPresenter[]
     declare invites?: InvitePresenter[]
+    declare categories: CategoryPresenter[]
 
     constructor(project: Project) {
         this.id = project.id
@@ -25,6 +27,7 @@ export class ProjectPresenter {
         this.roles = []
         this.invites = []
         this.users = []
+        this.categories = []
 
         if (project.roles) {
             this.roles = project.roles.map((role) => new RolePresenter(role))
@@ -47,6 +50,17 @@ export class ProjectPresenter {
         if (project.invites) {
             this.invites = project.invites.map((invite) => new InvitePresenter(invite))
         }
+
+        if (project.categories) {
+            this.categories = project.categories.map((category) => new CategoryPresenter(category))
+            this.categoriesOrder()
+        }
+    }
+
+    private categoriesOrder() {
+        if (this.categories) {
+            this.categories.sort((a, b) => a.order - b.order)
+        }
     }
 
     present(): ProjectDto {
@@ -59,6 +73,7 @@ export class ProjectPresenter {
             roles: this.roles?.map((role) => role.present()),
             users: this.users?.map((user) => user.present()),
             invites: this.invites?.map((invite) => invite.present()),
+            categories: this.categories.map((category) => category.present()),
         }
     }
 }

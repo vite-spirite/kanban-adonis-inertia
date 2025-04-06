@@ -85,14 +85,6 @@
                 <UserGroupIcon class="size-4" />
                 <span>Members</span>
             </Link>
-
-            <Link
-                class="inline-flex flex-row justify-start items-start space-x-2 font-medium font-roboto text-sm text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-900 transition py-4 relative z-10"
-                :href="`/dashboard/projects/${project.id}/edit`"
-            >
-                <PlusIcon class="size-4" />
-                <span>New list</span>
-            </Link>
         </div>
 
         <div class="w-full h-[2px] bg-gray-200 absolute left-0 bottom-0"></div>
@@ -108,7 +100,6 @@ import { Link } from '@inertiajs/vue3'
 import {
     ArrowLeftIcon,
     Cog6ToothIcon,
-    PlusIcon,
     QueueListIcon,
     ShieldCheckIcon,
     UserGroupIcon,

@@ -9,11 +9,17 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import transmit from '@adonisjs/transmit/services/main'
 
 const HomeController = () => import('#controllers/home_controller')
 const UserController = () => import('#controllers/users_controller')
 const DashboardController = () => import('#controllers/dashboard_controller')
 const ProjectController = () => import('#controllers/projects_controller')
+const ProjectCategoryController = () => import('#controllers/project_categories_controller')
+
+transmit.registerRoutes((route) => {
+    route.use(middleware.auth())
+})
 
 router.get('/', [HomeController, 'index']).as('home')
 
@@ -53,6 +59,8 @@ router
         router.get('/invites', [UserController, 'showInvite'])
         router.get('/invites/:token', [ProjectController, 'acceptInvite'])
         router.get('/invites/:token/reject', [UserController, 'rejectInvite'])
+
+        router.put('/projects/:id/categories/order', [ProjectCategoryController, 'reorder'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

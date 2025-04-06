@@ -39,4 +39,24 @@ export const PermissionDescription: Record<string, { title: string; description:
         title: 'Edit member role',
         description: 'Edit member role permissions',
     },
+    'project:category:create': {
+        title: 'Create category',
+        description: 'Create a new category',
+    },
+    'project:category:delete': {
+        title: 'Delete category',
+        description: 'Delete a category',
+    },
+    'project:category:edit': {
+        title: 'Edit category',
+        description: 'Edit category name and order',
+    },
+    'project:category:order': {
+        title: 'Edit category order',
+        description: 'Edit category order',
+    },
+    'project:category:read': {
+        title: 'Read category',
+        description: 'Read category details',
+    },
 }
