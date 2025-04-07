@@ -17,3 +17,11 @@ transmit.authorize<{ id: string }>(
         return bouncer.with(ProjectPolicy).allows('read', project)
     }
 )
+
+transmit.authorize<{ id: string }>('/user/:id/invites', ({ auth }: HttpContext, { id }) => {
+    if (!auth.user) {
+        return false
+    }
+
+    return auth.user.id === +id
+})

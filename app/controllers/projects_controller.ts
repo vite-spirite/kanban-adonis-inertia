@@ -9,6 +9,8 @@ import ProjectRolePolicy from '#policies/project_role_policy'
 import { UserService } from '#services/user_service'
 import { CreateInviteValidator } from '#validators/invite'
 import encryption from '@adonisjs/core/services/encryption'
+import transmit from '@adonisjs/transmit/services/main'
+import { InvitePresenter } from '#presenters/invite_presenter'
 
 @inject()
 export default class ProjectsController {
@@ -159,7 +161,20 @@ export default class ProjectsController {
         const payload = await CreateInviteValidator.validate(request.all())
         const user = await this.userService.findByEmail(payload.email)
 
-        await this.projectService.createInvite(project, payload, user ?? undefined)
+        const newInvite = await this.projectService.createInvite(
+            project,
+            payload,
+            user ?? undefined
+        )
+
+        if (newInvite.userId) {
+            console.log(newInvite.userId)
+            transmit.broadcast(`/user/${newInvite.userId}/invites`, {
+                type: 'add',
+                invite: new InvitePresenter(newInvite).present(),
+            })
+        }
+
         return response.redirect().back()
     }
 
@@ -218,6 +233,13 @@ export default class ProjectsController {
         const invite = await project.related('invites').query().where('id', params.inviteId).first()
         if (!invite) {
             return response.redirect().back()
+        }
+
+        if (invite.userId) {
+            transmit.broadcast(`/user/${invite.userId}/invites`, {
+                type: 'delete',
+                invite: new InvitePresenter(invite).present(),
+            })
         }
 
         await invite.delete()

@@ -21,7 +21,7 @@
                 >
                     <MenuItem
                         v-slot="{ active }"
-                        class="w-full py-2 text-neutral-800 font-medium text-left px-2 rounded-lg"
+                        class="w-full py-2 text-neutral-800 font-normal text-sm text-left px-2 rounded-lg"
                     >
                         <a
                             :class="{ 'bg-blue-500 !text-gray-100': active }"
@@ -34,7 +34,7 @@
                     </MenuItem>
                     <MenuItem
                         v-slot="{ active }"
-                        class="w-full py-2 text-neutral-800 font-medium text-left px-2 rounded-lg"
+                        class="w-full py-2 text-neutral-800 font-normal text-sm text-left px-2 rounded-lg"
                     >
                         <a
                             :class="{ 'bg-blue-500 !text-gray-100': active }"
@@ -47,7 +47,7 @@
                     </MenuItem>
                     <MenuItem
                         v-slot="{ active }"
-                        class="w-full py-2 text-neutral-800 font-medium text-left px-2 rounded-lg"
+                        class="w-full py-2 text-neutral-800 font-normal text-sm text-left px-2 rounded-lg"
                     >
                         <a
                             :class="{ 'bg-blue-500 !text-gray-100': active }"
@@ -60,16 +60,16 @@
                             </div>
 
                             <span
-                                v-if="user.invites.length > 0"
+                                v-if="invites.length > 0"
                                 class="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-blue-100 bg-blue-600 rounded-full"
                             >
-                                {{ user.invites.length }}
+                                {{ invites.length }}
                             </span>
                         </a>
                     </MenuItem>
                     <MenuItem
                         v-slot="{ active }"
-                        class="w-full py-2 text-neutral-800 font-medium text-left px-2 rounded-lg"
+                        class="w-full py-2 text-neutral-800 font-normal text-sm text-left px-2 rounded-lg"
                     >
                         <a
                             :class="{ 'bg-red-500 !text-gray-100': active }"
@@ -95,6 +95,38 @@ import {
     PlusIcon,
 } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { type Subscription, Transmit } from '@adonisjs/transmit-client'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import type { InviteDto } from '#types/invite.dto'
 
 const { user } = defineProps<{ user: MeDto }>()
+const invites = ref<InviteDto[]>([])
+
+let subscription: Subscription | null = null
+
+onMounted(async () => {
+    const transmit = new Transmit({
+        baseUrl: window.location.origin,
+    })
+
+    subscription = transmit.subscription(`/user/${user.id}/invites`)
+    await subscription.create()
+
+    subscription.onMessage<{ type: 'add' | 'delete'; invite: InviteDto }>((data) => {
+        if (data.type === 'add') {
+            invites.value.push(data.invite)
+        } else if (data.type === 'delete') {
+            invites.value = invites.value.filter((invite) => invite.id !== data.invite.id)
+        }
+    })
+})
+
+onBeforeUnmount(async () => {
+    if (subscription) {
+        await subscription.delete()
+        subscription = null
+    }
+})
+
+invites.value = user.invites
 </script>

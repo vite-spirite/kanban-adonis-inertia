@@ -1,9 +1,8 @@
-// import type { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 
 import { inject } from '@adonisjs/core'
 import { ProjectService } from '#services/project_service'
 import { ProjectCategoryService } from '#services/project_category_service'
-import { HttpContext } from '@adonisjs/core/http'
 import ProjectCategoryPolicy from '#policies/project_category_policy'
 import { CategoryEditValidation, CategoryReorderValidation } from '#validators/category'
 import transmit from '@adonisjs/transmit/services/main'

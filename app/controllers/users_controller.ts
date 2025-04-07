@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { LoginValidator, RegisterValidator } from '#validators/auth'
 import { inject } from '@adonisjs/core'
 import { UserService } from '#services/user_service'
+import { InvitePresenter } from '#presenters/invite_presenter'
+import transmit from '@adonisjs/transmit/services/main'
 
 @inject()
 export default class UsersController {
@@ -51,8 +53,10 @@ export default class UsersController {
             return response.redirect().back()
         }
 
+        const invites = await this.userService.findInviteByUser(auth.user)
+
         return inertia.render('dashboard/invites', {
-            invites: await this.userService.findInviteByUser(auth.user),
+            invites: invites.map((i) => new InvitePresenter(i).present()),
         })
     }
 
