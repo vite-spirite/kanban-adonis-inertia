@@ -1,13 +1,13 @@
 <template>
-    <div class="w-full min-h-screen bg-gray-50 flex flex-col">
+    <div class="w-full min-h-screen max-h-screen h-screen bg-gray-50 flex flex-col">
         <dashboardNavigation
             v-if="pageProps.user"
             :user="pageProps.user"
             :projects="pageProps.projects"
         />
 
-        <div class="flex flex-1 h-full overflow-auto">
-            <slot class="h-full" />
+        <div class="w-full h-full max-w-screen overflow-auto flex flex-1">
+			<slot class="h-full" />
         </div>
     </div>
 </template>
