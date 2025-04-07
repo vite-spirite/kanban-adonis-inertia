@@ -18,6 +18,11 @@
                     :alt="project.name"
                     class="size-8 rounded-lg"
                 />
+                <img
+                    v-else
+                    :src="`https://ui-avatars.com/api/?name=${encodeURI(project.name)}&background=000&color=fff&size=64`"
+                    class="rounded-lg size-8"
+                />
 
                 <h1 class="font-bold text-2xl font-open-sans">{{ project.name }}</h1>
             </div>

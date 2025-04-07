@@ -25,7 +25,12 @@
                         v-for="project in projects"
                         :key="`minimal-projects-${project.id}`"
                     >
-                        <img :src="project.image" class="rounded-lg size-8" />
+                        <img v-if="project.image" :src="project.image" class="rounded-lg size-8" />
+                        <img
+                            v-else
+                            :src="`https://ui-avatars.com/api/?name=${encodeURI(project.name)}&background=000&color=fff&size=64`"
+                            class="rounded-lg size-8"
+                        />
                         <span>{{ project.name }}</span>
                     </Link>
                 </div>
