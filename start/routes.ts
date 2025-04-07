@@ -61,6 +61,8 @@ router
         router.get('/invites/:token/reject', [UserController, 'rejectInvite'])
 
         router.put('/projects/:id/categories/order', [ProjectCategoryController, 'reorder'])
+        router.put('/projects/:id/categories/:categoryId', [ProjectCategoryController, 'edit'])
+        router.delete('/projects/:id/categories/:categoryId', [ProjectCategoryController, 'delete'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

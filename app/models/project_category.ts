@@ -14,6 +14,9 @@ export default class ProjectCategory extends BaseModel {
     declare name: string
 
     @column()
+    declare color: string
+
+    @column()
     declare order: number
 
     @belongsTo(() => Project)

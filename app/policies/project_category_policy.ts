@@ -23,4 +23,18 @@ export default class ProjectCategoryPolicy extends BasePolicy {
             (perm) => perm.permission === Permissions.PROJECT_CATEGORY_ORDER && perm.allow
         )
     }
+
+    async edit(user: User, project: Project): Promise<AuthorizerResponse> {
+        const capabilities = await this.getUserCapabilities(user, project)
+        return !!capabilities.find(
+            (perm) => perm.permission === Permissions.PROJECT_CATEGORY_EDIT && perm.allow
+        )
+    }
+
+    async delete(user: User, project: Project): Promise<AuthorizerResponse> {
+        const capabilities = await this.getUserCapabilities(user, project)
+        return !!capabilities.find(
+            (perm) => perm.permission === Permissions.PROJECT_CATEGORY_DELETE && perm.allow
+        )
+    }
 }

@@ -21,4 +21,19 @@ export class ProjectCategoryService {
             return project.related('categories').query({ client: trx }).orderBy('order', 'asc')
         })
     }
+
+    async findById(id: number): Promise<ProjectCategory | null> {
+        return ProjectCategory.query().preload('project').where('id', id).first()
+    }
+
+    async update(
+        category: ProjectCategory,
+        payload: { name?: string; color?: string }
+    ): Promise<void> {
+        await category.merge(payload).save()
+    }
+
+    async delete(category: ProjectCategory): Promise<void> {
+        await category.delete()
+    }
 }

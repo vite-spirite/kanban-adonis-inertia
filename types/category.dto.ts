@@ -3,4 +3,5 @@ export type CategoryDto = {
     projectId: number
     name: string
     order: number
+    color: string
 }

@@ -17,10 +17,20 @@
                     class="min-w-md max-w-md w-full flex flex-col justify-start items-start rounded-lg border border-gray-200 bg-gray-100 transition"
                 >
                     <div class="flex flex-row justify-start items-center p-4 w-full">
-                        <div class="bg-green-500 rounded-full size-4 mr-2"></div>
+                        <div
+                            class="rounded-full size-4 mr-2"
+                            :style="{ 'background-color': category.color }"
+                        ></div>
                         <h2 class="text-xl font-semibold text-gray-800 flex-1">
                             {{ category.name }}
                         </h2>
+
+                        <ProjectCategoryEdit
+                            :category="category"
+                            :allow-delete="allowDeleting"
+                            :allow-edit="allowEditing"
+                            v-if="allowDeleting || allowEditing"
+                        />
                     </div>
                 </div>
             </template>
@@ -43,7 +53,17 @@ import draggable from 'vuedraggable'
 import { useForm } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 
-const { projectId } = defineProps<{ projectId: number; allowSorting: boolean }>()
+import ProjectCategoryEdit from '~/components/projects/editing/edit_category_data.vue'
+
+const { projectId, allowEditing, allowDeleting } = defineProps<{
+    projectId: number
+    allowSorting: boolean
+    allowEditing: boolean
+    allowDeleting: boolean
+}>()
+
+console.log(projectId, allowEditing, allowDeleting)
+
 const categories = defineModel<CategoryDto[]>({ required: true })
 const categoryChangedIds = ref<number[]>([])
 const isSaved = ref(false)
