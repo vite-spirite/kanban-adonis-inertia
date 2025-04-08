@@ -1,5 +1,13 @@
 <template>
     <div class="w-full bg-bray-200 bg-gray-100 relative">
+        <ProjectCreateCategoryModal
+            v-if="can(capabilities, Permissions.PROJECT_CATEGORY_CREATE)"
+            :show="createCategoryModal"
+            @close="createCategoryModal = false"
+            :project-id="project.id"
+            :initial-order="project.categories.length"
+        />
+
         <div
             class="max-w-screen-2xl w-full flex flex-col justify-center items-start space-y-4 mx-auto py-12 2xl:px-0 px-4"
         >
@@ -90,6 +98,18 @@
                 <UserGroupIcon class="size-4" />
                 <span>Members</span>
             </Link>
+
+            <button
+                v-if="can(capabilities, Permissions.PROJECT_CATEGORY_CREATE)"
+                class="inline-flex flex-row justify-start items-start space-x-2 font-medium font-roboto text-sm text-gray-500 hover:text-gray-900 border-b-2 border-transparent hover:border-gray-900 transition py-4 px-2 relative z-10"
+                :class="{
+                    '!border-gray-900 !text-gray-900': createCategoryModal,
+                }"
+                @click.prevent="createCategoryModal = true"
+            >
+                <PlusIcon class="size-4" />
+                <span>Category</span>
+            </button>
         </div>
 
         <div class="w-full h-[2px] bg-gray-200 absolute left-0 bottom-0"></div>
@@ -100,6 +120,7 @@
 import type { ProjectDto } from '#types/project.dto'
 import type { PermissionDto } from '#types/permission.dto'
 
+import { ref } from 'vue'
 import { Permissions } from '~/utils/permission_enum'
 import { Link } from '@inertiajs/vue3'
 import {
@@ -108,8 +129,11 @@ import {
     QueueListIcon,
     ShieldCheckIcon,
     UserGroupIcon,
+    PlusIcon,
 } from '@heroicons/vue/24/solid'
 import { can } from '~/utils/can'
+import ProjectCreateCategoryModal from '~/components/projects/editing/create_category_dialog.vue'
 
 const { project } = defineProps<{ project: ProjectDto; capabilities: PermissionDto[] }>()
+const createCategoryModal = ref<boolean>(false)
 </script>

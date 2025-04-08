@@ -29,11 +29,19 @@ export class ProjectCategoryService {
     async update(
         category: ProjectCategory,
         payload: { name?: string; color?: string }
-    ): Promise<void> {
-        await category.merge(payload).save()
+    ): Promise<ProjectCategory> {
+        return category.merge(payload).save()
     }
 
-    async delete(category: ProjectCategory): Promise<void> {
+    async delete(category: ProjectCategory): Promise<number> {
         await category.delete()
+        return category.id
+    }
+
+    async create(
+        project: Project,
+        payload: { name: string; color: string; order: number }
+    ): Promise<ProjectCategory> {
+        return project.related('categories').create(payload)
     }
 }

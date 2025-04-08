@@ -4,7 +4,11 @@ import { inject } from '@adonisjs/core'
 import { ProjectService } from '#services/project_service'
 import { ProjectCategoryService } from '#services/project_category_service'
 import ProjectCategoryPolicy from '#policies/project_category_policy'
-import { CategoryEditValidation, CategoryReorderValidation } from '#validators/category'
+import {
+    CategoryCreateValidation,
+    CategoryEditValidation,
+    CategoryReorderValidation,
+} from '#validators/category'
 import transmit from '@adonisjs/transmit/services/main'
 import { CategoryPresenter } from '#presenters/category_presenter'
 
@@ -61,7 +65,13 @@ export default class ProjectCategoriesController {
 
         const payload = await request.validateUsing(CategoryEditValidation)
 
-        await this.categoryService.update(category, payload)
+        const categoryUpdated = await this.categoryService.update(category, payload)
+
+        transmit.broadcast(`/projects/${category.project.id}/categories`, {
+            type: 'category.update',
+            category: new CategoryPresenter(categoryUpdated).present(),
+        })
+
         return response.redirect().back()
     }
 
@@ -81,7 +91,39 @@ export default class ProjectCategoriesController {
             return response.redirect().back()
         }
 
-        await this.categoryService.delete(category)
+        const categoryIdDeleted = await this.categoryService.delete(category)
+
+        transmit.broadcast(`/projects/${category.project.id}/categories`, {
+            type: 'category.delete',
+            id: categoryIdDeleted,
+        })
+
+        return response.redirect().back()
+    }
+
+    async create({ request, params, auth, bouncer, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(+params.id)
+
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ProjectCategoryPolicy).denies('create', project)) {
+            return response.redirect().back()
+        }
+
+        const payload = await CategoryCreateValidation.validate(request.all())
+
+        const category = await this.categoryService.create(project, payload)
+
+        transmit.broadcast(`/projects/${project.id}/categories`, {
+            type: 'category.create',
+            category: new CategoryPresenter(category).present(),
+        })
 
         return response.redirect().back()
     }

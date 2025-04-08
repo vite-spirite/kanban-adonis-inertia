@@ -36,13 +36,7 @@
             </template>
         </draggable>
 
-        <div class="min-w-md max-w-md w-full flex flex-col justify-start items-start">
-            <div
-                class="flex flex-row justify-start items-center py-4 border-b-2 border-gray-200 w-full"
-            >
-                <h2 class="text-2xl font-semibold text-gray-800">+ Create category</h2>
-            </div>
-        </div>
+        <div class="min-w-md max-w-md w-full"></div>
     </div>
 </template>
 
@@ -61,8 +55,6 @@ const { projectId, allowEditing, allowDeleting } = defineProps<{
     allowEditing: boolean
     allowDeleting: boolean
 }>()
-
-console.log(projectId, allowEditing, allowDeleting)
 
 const categories = defineModel<CategoryDto[]>({ required: true })
 const categoryChangedIds = ref<number[]>([])

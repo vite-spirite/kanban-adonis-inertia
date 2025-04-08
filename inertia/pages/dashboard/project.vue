@@ -40,8 +40,8 @@ const categories = ref<CategoryDto[]>(pageProps.value.project.categories ?? [])
 
 watch(
     () => pageProps.value.project.categories,
-    () => {
-        categories.value = pageProps.value.project.categories
+    (value) => {
+        categories.value = value ?? []
     }
 )
 
@@ -54,9 +54,41 @@ onMounted(async () => {
 
     await subscription.create()
 
-    subscription.onMessage<{ type: string } & Record<string, any>>((data) => {
-        if (data.type === 'category.reorder') {
+    subscription.onMessage<{
+        type: 'category.reorder' | 'category.update' | 'category.delete' | 'category.create'
+        categories?: CategoryDto[]
+        category?: CategoryDto
+        id?: number
+    }>((data) => {
+        if (data.type === 'category.reorder' && data.categories) {
             categories.value = data.categories
+        }
+
+        if (data.type === 'category.update') {
+            const index = categories.value.findIndex(
+                (category) => category.id === data.category?.id
+            )
+
+            if (index == -1) {
+                return
+            }
+
+            categories.value[index] = data.category as CategoryDto
+        }
+
+        if (data.type === 'category.delete' && data.id) {
+            const index = categories.value.findIndex((category) => category.id === data.id)
+
+            if (index == -1) {
+                return
+            }
+
+            categories.value.splice(index, 1)
+        }
+
+        if (data.type === 'category.create' && data.category) {
+            categories.value.push(data.category as CategoryDto)
+            categories.value.sort((a, b) => a.order - b.order)
         }
     })
 })
