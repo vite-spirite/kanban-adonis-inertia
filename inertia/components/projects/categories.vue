@@ -1,8 +1,6 @@
 <template>
-    <div
-        class="flex flex-row justify-start items-stretch space-x-4 w-full min-w-screen overflow-x-auto h-full px-4"
-    >
-        <div class="min-w-md max-w-md w-full"></div>
+    <div class="flex flex-row justify-start items-stretch space-x-4 h-full px-4 overflow-auto">
+        <div class="min-w-xs max-w-xs w-full"></div>
 
         <draggable
             v-model="categories"
@@ -36,7 +34,7 @@
             </template>
         </draggable>
 
-        <div class="min-w-md max-w-md w-full"></div>
+        <div class="min-w-xs max-w-xs w-full"></div>
     </div>
 </template>
 

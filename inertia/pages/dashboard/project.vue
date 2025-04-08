@@ -1,11 +1,39 @@
 <template>
     <Head :title="pageProps.project.name" />
 
-    <div class="flex flex-col w-full">
+    <div class="flex flex-col w-full max-w-screen">
         <ProjectHeader :project="pageProps.project" :capabilities="pageProps.capabilities" />
 
-        <div class="flex-1 w-full relative pt-12 h-full">
+        <ProjectTagCreateDialog
+            v-if="can(pageProps.capabilities, Permissions.PROJECT_TAG_CREATE)"
+            :project-id="pageProps.project.id"
+            :show="tagCreateDialog"
+            @close="tagCreateDialog = false"
+        />
+
+        <div
+            class="flex-1 w-full relative h-full flex flex-row justify-start items-start max-w-screen"
+        >
+            <div class="w-1/8 p-4 h-full bg-gray-100">
+                <div class="flex flex-col justify-items-start items-start space-y-4">
+                    <h3 class="font-semibold text-lg text-gray-800">Tags:</h3>
+
+                    <div class="flex flex-row justify-start items-center gap-2 flex-wrap">
+                        <ProjectTag v-for="tag in tags" :tag="tag" />
+                        <button
+                            v-if="can(pageProps.capabilities, Permissions.PROJECT_TAG_CREATE)"
+                            class="font-medium text-sm px-2 py-1 inline-flex flex-row justify-center items-center space-x-1 rounded-md bg-transparent border-2 border-dashed border-gray-200 text-gray-950 hover:bg-blue-500 hover:text-gray-50 hover:border-transparent transition duration-75 cursor-pointer"
+                            @click.prevent="tagCreateDialog = true"
+                        >
+                            <PlusIcon class="size-4" />
+                            <span class="inline-block">Create tag</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <ProjectCategory
+                class="flex-1 py-6"
                 v-model="categories"
                 :project-id="pageProps.project.id"
                 :allow-sorting="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_ORDER)"
@@ -20,6 +48,7 @@
 import type { InferPageProps } from '@adonisjs/inertia/types'
 import type DashboardController from '#controllers/dashboard_controller'
 import type { CategoryDto } from '#types/category.dto'
+import type { TagDto } from '#types/tag.dto'
 
 import { usePage, Head } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
@@ -31,30 +60,37 @@ import ProjectCategory from '~/components/projects/categories.vue'
 import { can } from '~/utils/can'
 import { Permissions } from '~/utils/permission_enum'
 
-let subscription: Subscription | null = null
+import { PlusIcon } from '@heroicons/vue/24/solid'
+
+import ProjectTag from '~/components/projects/tag.vue'
+import ProjectTagCreateDialog from '~/components/projects/editing/create_tag_dialog.vue'
+
+let categorySubscription: Subscription | null = null
+let tagSubscription: Subscription | null = null
 
 const page = usePage<InferPageProps<DashboardController, 'project'>>()
 const pageProps = computed(() => page.props)
 
 const categories = ref<CategoryDto[]>(pageProps.value.project.categories ?? [])
+const tags = ref<TagDto[]>(pageProps.value.project.tags ?? [])
 
-watch(
-    () => pageProps.value.project.categories,
-    (value) => {
-        categories.value = value ?? []
-    }
-)
+const tagCreateDialog = ref(false)
 
 onMounted(async () => {
     const transmit = new Transmit({
         baseUrl: window.location.origin,
     })
 
-    subscription = transmit.subscription(`/projects/${pageProps.value.project.id}/categories`)
+    categorySubscription = transmit.subscription(
+        `/projects/${pageProps.value.project.id}/categories`
+    )
 
-    await subscription.create()
+    tagSubscription = transmit.subscription(`/projects/${pageProps.value.project.id}/tags`)
 
-    subscription.onMessage<{
+    await categorySubscription.create()
+    await tagSubscription.create()
+
+    categorySubscription.onMessage<{
         type: 'category.reorder' | 'category.update' | 'category.delete' | 'category.create'
         categories?: CategoryDto[]
         category?: CategoryDto
@@ -91,11 +127,21 @@ onMounted(async () => {
             categories.value.sort((a, b) => a.order - b.order)
         }
     })
+
+    tagSubscription.onMessage<{ type: 'tag.created'; tag: TagDto }>((data) => {
+        if (data.type === 'tag.created' && data.tag) {
+            tags.value.push(data.tag)
+        }
+    })
 })
 
 onBeforeUnmount(async () => {
-    if (subscription) {
-        await subscription.delete()
+    if (categorySubscription) {
+        await categorySubscription.delete()
+    }
+
+    if (tagSubscription) {
+        await tagSubscription.delete()
     }
 })
 </script>

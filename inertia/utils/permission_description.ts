@@ -59,4 +59,16 @@ export const PermissionDescription: Record<string, { title: string; description:
         title: 'Read category',
         description: 'Read category details',
     },
+    'project:tag:create': {
+        title: 'Create tag',
+        description: 'Create a new tag',
+    },
+    'project:tag:delete': {
+        title: 'Delete tag',
+        description: 'Delete a tag',
+    },
+    'project:tag:edit': {
+        title: 'Edit tag',
+        description: 'Edit tag name and order',
+    },
 }

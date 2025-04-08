@@ -4,6 +4,7 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import ProjectRole from '#models/project_role'
 import ProjectInvite from '#models/project_invite'
 import ProjectCategory from '#models/project_category'
+import ProjectTag from '#models/project_tag'
 
 export default class Project extends BaseModel {
     @column({ isPrimary: true })
@@ -23,6 +24,9 @@ export default class Project extends BaseModel {
 
     @hasMany(() => ProjectCategory)
     declare categories: HasMany<typeof ProjectCategory>
+
+    @hasMany(() => ProjectTag, { localKey: 'id', foreignKey: 'projectId' })
+    declare tags: HasMany<typeof ProjectTag>
 
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime

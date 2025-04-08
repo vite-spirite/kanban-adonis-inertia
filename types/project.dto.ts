@@ -4,6 +4,7 @@ import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import type { UserDto } from '#types/user.dto'
 import type { InviteDto } from '#types/invite.dto'
 import type { CategoryDto } from '#types/category.dto'
+import type { TagDto } from '#types/tag.dto'
 
 export type MinimalProjectDto = Pick<Project, 'id' | 'name' | 'image'>
 
@@ -17,6 +18,7 @@ export type ProjectDto = {
     users?: UserDto[]
     invites?: InviteDto[]
     categories?: CategoryDto[]
+    tags?: TagDto[]
 }
 
 export type ProjectEditDto = {

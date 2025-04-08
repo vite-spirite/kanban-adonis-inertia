@@ -7,6 +7,7 @@ import { cuid } from '@adonisjs/core/helpers'
 import drive from '@adonisjs/drive/services/main'
 import encryption from '@adonisjs/core/services/encryption'
 import ProjectInvite from '#models/project_invite'
+import ProjectTag from '#models/project_tag'
 
 export class ProjectService {
     /**
@@ -63,6 +64,7 @@ export class ProjectService {
             .preload('roles', (query) => query.preload('permissions').preload('users'))
             .preload('invites', (q) => q.preload('user'))
             .preload('categories', (q) => q.orderBy('order', 'asc'))
+            .preload('tags')
             .where('id', id)
             .firstOrFail()
     }
@@ -103,10 +105,7 @@ export class ProjectService {
      * Update project information
      */
     async update(project: Project, payload: ProjectEditDto): Promise<Project> {
-        console.log(payload)
         const imageUrl = await this.handleImageUpload(project, payload.image)
-
-        console.log(payload)
 
         project.merge({
             ...payload,
@@ -165,5 +164,12 @@ export class ProjectService {
 
     async findInviteByToken(token: string): Promise<ProjectInvite | null> {
         return ProjectInvite.query().where('token', token).first()
+    }
+
+    async createTag(
+        project: Project,
+        payload: { name: string; color: string }
+    ): Promise<ProjectTag> {
+        return await project.related('tags').create(payload)
     }
 }

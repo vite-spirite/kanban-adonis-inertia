@@ -13,4 +13,7 @@ export enum Permissions {
     PROJECT_CATEGORY_DELETE = 'project:category:delete',
     PROJECT_CATEGORY_EDIT = 'project:category:edit',
     PROJECT_CATEGORY_ORDER = 'project:category:order',
+    PROJECT_TAG_CREATE = 'project:tag:create',
+    PROJECT_TAG_DELETE = 'project:tag:delete',
+    PROJECT_TAG_EDIT = 'project:tag:edit',
 }
