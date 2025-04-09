@@ -67,6 +67,8 @@ router
         router.post('/projects/:id/categories', [ProjectCategoryController, 'create'])
 
         router.post('/projects/:id/tags', [ProjectTagController, 'create'])
+        router.put('/projects/:id/tags', [ProjectTagController, 'edit'])
+        router.delete('/projects/:id/tags/:tagId', [ProjectTagController, 'delete'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

@@ -19,7 +19,13 @@
                     <h3 class="font-semibold text-lg text-gray-800">Tags:</h3>
 
                     <div class="flex flex-row justify-start items-center gap-2 flex-wrap">
-                        <ProjectTag v-for="tag in tags" :tag="tag" />
+                        <ProjectTag
+                            v-for="tag in tags"
+                            :key="`project_${pageProps.project.id}_tag_${tag.id}_editable`"
+                            :tag="tag"
+                            :editable="can(pageProps.capabilities, Permissions.PROJECT_TAG_EDIT)"
+                            :removable="can(pageProps.capabilities, Permissions.PROJECT_TAG_DELETE)"
+                        />
                         <button
                             v-if="can(pageProps.capabilities, Permissions.PROJECT_TAG_CREATE)"
                             class="font-medium text-sm px-2 py-1 inline-flex flex-row justify-center items-center space-x-1 rounded-md bg-transparent border-2 border-dashed border-gray-200 text-gray-950 hover:bg-blue-500 hover:text-gray-50 hover:border-transparent transition duration-75 cursor-pointer"
@@ -128,11 +134,33 @@ onMounted(async () => {
         }
     })
 
-    tagSubscription.onMessage<{ type: 'tag.created'; tag: TagDto }>((data) => {
-        if (data.type === 'tag.created' && data.tag) {
-            tags.value.push(data.tag)
+    tagSubscription.onMessage<{ type: 'tag.created' | 'tag.deleted' | 'tag.updated'; tag: TagDto }>(
+        (data) => {
+            if (data.type === 'tag.created' && data.tag) {
+                tags.value.push(data.tag)
+            }
+
+            if (data.type === 'tag.deleted' && data.tag) {
+                const index = tags.value.findIndex((tag) => tag.id === data.tag.id)
+
+                if (index == -1) {
+                    return
+                }
+
+                tags.value.splice(index, 1)
+            }
+
+            if (data.type === 'tag.updated' && data.tag) {
+                const index = tags.value.findIndex((tag) => tag.id === data.tag.id)
+
+                if (index == -1) {
+                    return
+                }
+
+                tags.value[index] = data.tag
+            }
         }
-    })
+    )
 })
 
 onBeforeUnmount(async () => {

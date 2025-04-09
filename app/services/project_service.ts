@@ -8,6 +8,7 @@ import drive from '@adonisjs/drive/services/main'
 import encryption from '@adonisjs/core/services/encryption'
 import ProjectInvite from '#models/project_invite'
 import ProjectTag from '#models/project_tag'
+import ProjectTagPolicy from '#policies/project_tag_policy'
 
 export class ProjectService {
     /**
@@ -171,5 +172,10 @@ export class ProjectService {
         payload: { name: string; color: string }
     ): Promise<ProjectTag> {
         return await project.related('tags').create(payload)
+    }
+
+    async editTag(tag: ProjectTag, payload: { name: string; color: string }): Promise<ProjectTag> {
+        console.log(tag)
+        return tag.merge(payload).save()
     }
 }
