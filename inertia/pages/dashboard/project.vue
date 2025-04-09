@@ -57,12 +57,13 @@
             </div>
 
             <ProjectCategory
-                class="flex-1 py-6"
+                class="flex-1"
                 v-model="categories"
                 :project-id="pageProps.project.id"
                 :allow-sorting="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_ORDER)"
                 :allow-editing="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_EDIT)"
                 :allow-deleting="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_DELETE)"
+                :allow-task-sorting="can(pageProps.capabilities, Permissions.PROJECT_TASK_ORDER)"
             />
         </div>
     </div>
@@ -99,6 +100,13 @@ const categories = ref<CategoryDto[]>(pageProps.value.project.categories ?? [])
 const tags = ref<TagDto[]>(pageProps.value.project.tags ?? [])
 
 const tagCreateDialog = ref(false)
+
+watch(
+    () => pageProps.value.project.categories,
+    (value) => {
+        categories.value = value as CategoryDto[]
+    }
+)
 
 onMounted(async () => {
     const transmit = new Transmit({

@@ -17,6 +17,7 @@ const DashboardController = () => import('#controllers/dashboard_controller')
 const ProjectController = () => import('#controllers/projects_controller')
 const ProjectCategoryController = () => import('#controllers/project_categories_controller')
 const ProjectTagController = () => import('#controllers/project_tags_controller')
+const ProjectTaskController = () => import('#controllers/tasks_controller')
 
 transmit.registerRoutes((route) => {
     route.use(middleware.auth())
@@ -69,6 +70,8 @@ router
         router.post('/projects/:id/tags', [ProjectTagController, 'create'])
         router.put('/projects/:id/tags', [ProjectTagController, 'edit'])
         router.delete('/projects/:id/tags/:tagId', [ProjectTagController, 'delete'])
+
+        router.post('/projects/:id/tasks/order', [ProjectTaskController, 'reorder'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

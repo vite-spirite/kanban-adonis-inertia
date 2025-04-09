@@ -64,7 +64,9 @@ export class ProjectService {
         return Project.query()
             .preload('roles', (query) => query.preload('permissions').preload('users'))
             .preload('invites', (q) => q.preload('user'))
-            .preload('categories', (q) => q.orderBy('order', 'asc'))
+            .preload('categories', (q) =>
+                q.orderBy('order', 'asc').preload('tasks', (st) => st.orderBy('order', 'asc'))
+            )
             .preload('tags')
             .where('id', id)
             .firstOrFail()

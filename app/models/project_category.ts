@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import Project from '#models/project'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import Task from '#models/task'
 
 export default class ProjectCategory extends BaseModel {
     @column({ isPrimary: true })
@@ -21,6 +22,9 @@ export default class ProjectCategory extends BaseModel {
 
     @belongsTo(() => Project)
     declare project: BelongsTo<typeof Project>
+
+    @hasMany(() => Task, { localKey: 'id', foreignKey: 'categoryId' })
+    declare tasks: HasMany<typeof Task>
 
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime

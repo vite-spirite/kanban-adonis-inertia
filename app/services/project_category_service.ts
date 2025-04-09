@@ -18,7 +18,13 @@ export class ProjectCategoryService {
 
             await trx.commit()
 
-            return project.related('categories').query({ client: trx }).orderBy('order', 'asc')
+            return project
+                .related('categories')
+                .query({ client: trx })
+                .orderBy('order', 'asc')
+                .preload('tasks', (st) => {
+                    st.orderBy('order', 'asc')
+                })
         })
     }
 

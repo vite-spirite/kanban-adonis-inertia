@@ -71,4 +71,20 @@ export const PermissionDescription: Record<string, { title: string; description:
         title: 'Edit tag',
         description: 'Edit tag name and order',
     },
+    'project:task:create': {
+        title: 'Create task',
+        description: 'Create a new task',
+    },
+    'project:task:delete': {
+        title: 'Delete task',
+        description: 'Delete a task',
+    },
+    'project:task:edit': {
+        title: 'Edit task',
+        description: 'Edit task name and order',
+    },
+    'project:task:order': {
+        title: 'Edit task order',
+        description: 'Edit task order',
+    },
 }

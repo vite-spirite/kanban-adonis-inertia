@@ -32,6 +32,10 @@ export enum Permissions {
     PROJECT_TAG_CREATE = 'project:tag:create',
     PROJECT_TAG_DELETE = 'project:tag:delete',
     PROJECT_TAG_EDIT = 'project:tag:edit',
+    PROJECT_TASK_CREATE = 'project:task:create',
+    PROJECT_TASK_DELETE = 'project:task:delete',
+    PROJECT_TASK_EDIT = 'project:task:edit',
+    PROJECT_TASK_ORDER = 'project:task:order',
 }
 
 /**
