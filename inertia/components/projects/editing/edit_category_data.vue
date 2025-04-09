@@ -37,6 +37,7 @@
                                 <div class="mt-4 w-full">
                                     <form
                                         class="w-full flex flex-col justify-start items-start space-y-4"
+                                        @submit.prevent="editSubmit"
                                     >
                                         <div
                                             class="flex flex-col justify-start items-start space-y-2 w-full"
