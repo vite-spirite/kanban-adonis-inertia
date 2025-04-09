@@ -7,10 +7,18 @@ export class ProjectCategoryService {
         project: Project,
         payload: { id: number; order: number }[]
     ): Promise<ProjectCategory[]> {
-        const orderedPayload = payload.sort((a, b) => a.order - b.order)
-
         return await db.transaction(async (trx) => {
-            for (const category of orderedPayload) {
+            const categories = await ProjectCategory.query({ client: trx }).whereIn(
+                'id',
+                payload.map((p) => p.id)
+            )
+
+            for (const category of payload) {
+                const categoryToUpdate = categories.find((c) => c.id === category.id)
+                if (!categoryToUpdate || categoryToUpdate.order === category.order) {
+                    continue
+                }
+
                 await ProjectCategory.query({ client: trx })
                     .where('id', category.id)
                     .update({ order: category.order })
