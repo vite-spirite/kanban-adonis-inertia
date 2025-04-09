@@ -36,6 +36,24 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="flex flex-col justify-items-start items-start space-y-4 mt-6">
+                    <h3 class="font-semibold text-lg text-gray-800">Members:</h3>
+
+                    <div class="flex flex-col justify-start items-center space-y-4 w-full">
+                        <div
+                            v-for="member in pageProps.project.users ?? []"
+                            class="w-full flex flex-row justify-start items-center space-x-2"
+                        >
+                            <img
+                                :src="`https://ui-avatars.com/api/?name=${encodeURI(member.fullName)}&size=32`"
+                                :alt="member.fullName"
+                                class="size-8 rounded-full"
+                            />
+                            <span class="inline-block">{{ member.fullName }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <ProjectCategory

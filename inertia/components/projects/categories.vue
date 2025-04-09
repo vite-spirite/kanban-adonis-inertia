@@ -1,20 +1,22 @@
 <template>
-    <div class="flex flex-row justify-start items-stretch space-x-4 h-full px-4 overflow-auto">
-        <div class="min-w-xs max-w-xs w-full"></div>
+    <div class="flex flex-row justify-start items-stretch space-x-4 h-full overflow-auto">
+        <!--        <div class="min-w-xs max-w-xs w-full"></div>-->
 
         <draggable
             v-model="categories"
             item-key="id"
             group="categories"
-            class="flex flex-row justify-start items-stretch space-x-4 flex-1 h-full"
+            class="flex flex-row justify-start items-stretch flex-1 h-full"
             @change="onChange"
             :disabled="!allowSorting || isSaved"
         >
             <template #item="{ element: category }">
                 <div
-                    class="min-w-md max-w-md w-full flex flex-col justify-start items-start rounded-lg border border-gray-200 bg-gray-100 transition"
+                    class="min-w-md max-w-md w-full flex flex-col justify-start items-start transition bg-gray-50"
                 >
-                    <div class="flex flex-row justify-start items-center p-4 w-full">
+                    <div
+                        class="flex flex-row justify-start items-center p-4 w-full border-b border-gray-200"
+                    >
                         <div
                             class="rounded-full size-4 mr-2"
                             :style="{ 'background-color': category.color }"
@@ -34,7 +36,7 @@
             </template>
         </draggable>
 
-        <div class="min-w-xs max-w-xs w-full"></div>
+        <!--        <div class="min-w-xs max-w-xs w-full"></div>-->
     </div>
 </template>
 
