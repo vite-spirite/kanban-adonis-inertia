@@ -7,7 +7,7 @@
         />
 
         <div class="w-full h-full max-w-screen overflow-auto flex flex-1">
-			<slot class="h-full" />
+            <slot class="h-full" />
         </div>
     </div>
 </template>

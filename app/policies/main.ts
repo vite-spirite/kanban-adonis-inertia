@@ -13,9 +13,9 @@
 */
 
 export const policies = {
-  TaskPolicy: () => import('#policies/task_policy'),
-  ProjectTagPolicy: () => import('#policies/project_tag_policy'),
-  ProjectCategoryPolicy: () => import('#policies/project_category_policy'),
-  ProjectRolePolicy: () => import('#policies/project_role_policy'),
-  ProjectPolicy: () => import('#policies/project_policy'),
+    TaskPolicy: () => import('#policies/task_policy'),
+    ProjectTagPolicy: () => import('#policies/project_tag_policy'),
+    ProjectCategoryPolicy: () => import('#policies/project_category_policy'),
+    ProjectRolePolicy: () => import('#policies/project_role_policy'),
+    ProjectPolicy: () => import('#policies/project_policy'),
 }
