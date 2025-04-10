@@ -95,8 +95,9 @@ import {
     PlusIcon,
 } from '@heroicons/vue/24/solid'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-import { type Subscription, Transmit } from '@adonisjs/transmit-client'
+import { type Subscription } from '@adonisjs/transmit-client'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { transmit } from '~/utils/transmit'
 import type { InviteDto } from '#types/invite.dto'
 
 const { user } = defineProps<{ user: MeDto }>()
@@ -105,11 +106,8 @@ const invites = ref<InviteDto[]>([])
 let subscription: Subscription | null = null
 
 onMounted(async () => {
-    const transmit = new Transmit({
-        baseUrl: window.location.origin,
-    })
-
-    subscription = transmit.subscription(`/user/${user.id}/invites`)
+    console.log(transmit)
+    subscription = transmit.instance.subscription(`/user/${user.id}/invites`)
     await subscription.create()
 
     subscription.onMessage<{ type: 'add' | 'delete'; invite: InviteDto }>((data) => {
