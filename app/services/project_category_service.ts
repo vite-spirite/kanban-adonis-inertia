@@ -31,7 +31,7 @@ export class ProjectCategoryService {
                 .query({ client: trx })
                 .orderBy('order', 'asc')
                 .preload('tasks', (st) => {
-                    st.orderBy('order', 'asc')
+                    st.orderBy('order', 'asc').preload('tags', (stt) => stt.orderBy('order', 'asc'))
                 })
         })
     }

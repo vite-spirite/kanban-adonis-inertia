@@ -144,15 +144,7 @@ onMounted(async () => {
         id?: number
     }>((data) => {
         if (data.type === 'category.reorder' && data.categories) {
-            data.categories.forEach((category: CategoryDto) => {
-                const index = categories.value.findIndex((c) => c.id === category.id)
-
-                if (index !== -1) {
-                    categories.value[index].order = category.order
-                }
-            })
-
-            categories.value.sort((a, b) => a.order - b.order)
+            categories.value = data.categories
         }
 
         if (data.type === 'category.update') {

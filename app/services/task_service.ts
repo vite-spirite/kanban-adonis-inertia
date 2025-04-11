@@ -42,8 +42,9 @@ export class TaskService {
             return ProjectCategory.query({ client: trx })
                 .whereIn('id', categoryIds)
                 .preload('tasks', (s) => {
-                    s.orderBy('order', 'asc')
+                    s.orderBy('order', 'asc').preload('tags', (st) => st.orderBy('order', 'asc'))
                 })
+                .orderBy('order', 'asc')
         })
     }
 
