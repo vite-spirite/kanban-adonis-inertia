@@ -27,19 +27,13 @@
 
 <script lang="ts" setup>
 import type { CategoryDto } from '#types/category.dto'
-import type { TaskDto } from '#types/task.dto'
 
-import { PlusCircleIcon } from '@heroicons/vue/24/outline'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 
-import ProjectCategoryEdit from '~/components/projects/editing/edit_category_data.vue'
-import ProjectTaskCard from '~/components/projects/task.vue'
-import ProjectCreateTask from '~/components/projects/editing/create_task.vue'
 import ProjectCategory from '~/components/projects/category.vue'
 import draggable from 'vuedraggable'
-import { transmit } from '~/utils/transmit'
 
 const { projectId, allowEditing, allowDeleting } = defineProps<{
     projectId: number
