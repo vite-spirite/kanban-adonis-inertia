@@ -1,3 +1,5 @@
+import { TagDto } from '#types/tag.dto'
+
 export type TaskDto = {
     id: number
     name: string
@@ -7,4 +9,5 @@ export type TaskDto = {
     categoryId: number
     createdAt: string
     updatedAt: string
+    tags: TagDto[]
 }

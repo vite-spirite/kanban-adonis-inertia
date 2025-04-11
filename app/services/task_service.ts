@@ -5,6 +5,13 @@ import Task from '#models/task'
 import ProjectCategory from '#models/project_category'
 
 export class TaskService {
+    async findById(id: number): Promise<Task | null> {
+        return Task.query()
+            .preload('tags', (s) => s.orderBy('order', 'asc'))
+            .where('id', id)
+            .first()
+    }
+
     async reorder(project: Project, payload: { id: number; categoryId: number; order: number }[]) {
         return await db.transaction(async (trx) => {
             const categories =
@@ -65,5 +72,19 @@ export class TaskService {
             description: payload.description,
             dueDate: payload.dueDate ? DateTime.fromISO(payload.dueDate) : undefined,
         })
+    }
+
+    async updateTags(task: Task, payload: { id: number; order: number }[]) {
+        const synchronizeArray = {}
+
+        for (const tag of payload) {
+            synchronizeArray[tag.id] = { order: tag.order }
+        }
+
+        console.log(synchronizeArray)
+
+        await task.related('tags').sync(synchronizeArray, true)
+
+        return this.findById(task.id)
     }
 }

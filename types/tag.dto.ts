@@ -6,4 +6,5 @@ export type TagDto = {
     color: string
     projectId: number
     project?: MinimalProjectDto
+    order?: number
 }

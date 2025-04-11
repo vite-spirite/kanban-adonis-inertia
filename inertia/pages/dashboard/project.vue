@@ -24,9 +24,10 @@
                         item-key="id"
                         class="flex flex-row justify-start items-center gap-2 flex-wrap"
                         @change="removeAddedTagByDraggable"
+                        :disabled="!can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)"
                     >
                         <template #item="{ element: tag }">
-                            <div class="cursor-move">
+                            <div class="cursor-default">
                                 <ProjectTag
                                     :tag="tag"
                                     :editable="
@@ -143,7 +144,15 @@ onMounted(async () => {
         id?: number
     }>((data) => {
         if (data.type === 'category.reorder' && data.categories) {
-            categories.value = data.categories
+            data.categories.forEach((category: CategoryDto) => {
+                const index = categories.value.findIndex((c) => c.id === category.id)
+
+                if (index !== -1) {
+                    categories.value[index].order = category.order
+                }
+            })
+
+            categories.value.sort((a, b) => a.order - b.order)
         }
 
         if (data.type === 'category.update') {

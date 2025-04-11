@@ -8,6 +8,7 @@ export class TagPresenter {
     declare color: string
     declare projectId: number
     declare project?: ProjectPresenter
+    declare order?: number
 
     constructor(tag: ProjectTag) {
         this.id = tag.id
@@ -15,6 +16,10 @@ export class TagPresenter {
         this.color = tag.color
         this.projectId = tag.projectId
         this.project = tag.project ? new ProjectPresenter(tag.project) : undefined
+
+        if (tag.$extras.pivot_order !== undefined) {
+            this.order = tag.$extras.pivot_order
+        }
     }
 
     present(): TagDto {
@@ -24,6 +29,7 @@ export class TagPresenter {
             color: this.color,
             projectId: this.projectId,
             project: this.project?.present(),
+            order: this.order,
         }
     }
 }

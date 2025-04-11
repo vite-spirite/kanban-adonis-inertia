@@ -6,8 +6,6 @@ import Project from '#models/project'
 transmit.authorize<{ id: string }>(
     '/projects/:id/categories',
     async ({ auth, bouncer }: HttpContext, { id }) => {
-        console.log(id)
-
         if (!auth.user) {
             return false
         }

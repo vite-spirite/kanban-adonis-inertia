@@ -7,6 +7,7 @@
             group="task_tag"
             v-model="tags"
             item-key="id"
+            @change="onTagChanged"
         >
             <template #item="{ element: tag }">
                 <div>
@@ -33,16 +34,27 @@
 
 <script lang="ts" setup>
 import type { TaskDto } from '#types/task.dto'
+import type { TagDto } from '#types/tag.dto'
+
 import { DateTime } from 'luxon'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useForm } from '@inertiajs/vue3'
 import { ClockIcon } from '@heroicons/vue/24/outline'
 
 import Tag from '~/components/projects/tag.vue'
 import vuedraggable from 'vuedraggable'
+import { useDebounceFn } from '@vueuse/core'
 
-const { task } = defineProps<{ task: TaskDto }>()
+const { task, projectId } = defineProps<{ task: TaskDto; projectId: number }>()
 
-const tags = ref<TaskDto[]>([])
+const tags = ref<TaskDto[]>(task.tags)
+
+watch(
+    () => task.tags,
+    (newTags) => {
+        tags.value = newTags
+    }
+)
 
 const formatDate = computed(() => {
     if (!task.dueDate) return 'No due date'
@@ -50,4 +62,57 @@ const formatDate = computed(() => {
     const date = DateTime.fromISO(task.dueDate)
     return date.isValid ? date.toFormat('dd LLL yyyy') : 'No due date'
 })
+
+const tagChangedIds = ref<number[]>([])
+const tagForm = useForm<{ tags: { id: number; order: number }[] }>({
+    tags: [],
+})
+
+const onTagChanged = async (e: any) => {
+    if (e.added) {
+        const tag = e.added.element as TagDto
+        const tagWithoutAdded = [...tags.value]
+        tagWithoutAdded.splice(e.added.newIndex, 1)
+
+        if (tagWithoutAdded.find((t) => t.id === tag.id)) {
+            tags.value.splice(e.added.newIndex, 1)
+
+            return
+        }
+
+        tagChangedIds.value.push(e.added.element.id)
+    }
+
+    if (e.removed) {
+        tagChangedIds.value.push(e.removed.element.id)
+    }
+
+    if (e.moved) {
+        tagChangedIds.value.push(e.moved.element.id)
+    }
+
+    await saveTagChangedDebounced()
+}
+
+const saveTagChangedDebounced = useDebounceFn(async () => {
+    if (tagChangedIds.value.length === 0) return
+
+    const data: { id: number; order: number }[] = []
+
+    tags.value.forEach((tag, index) => {
+        data.push({
+            id: tag.id,
+            order: index,
+        })
+    })
+
+    tagForm.tags = data
+
+    await tagForm.post(`/dashboard/projects/${projectId}/tasks/${task.id}/tags`, {
+        preserveState: true,
+        onSuccess: () => {
+            tagChangedIds.value = []
+        },
+    })
+}, 1000)
 </script>

@@ -73,6 +73,7 @@ router
 
         router.post('/projects/:id/tasks/order', [ProjectTaskController, 'reorder'])
         router.post('/projects/:id/tasks', [ProjectTaskController, 'create'])
+        router.post('/projects/:id/tasks/:taskId/tags', [ProjectTaskController, 'updateTags'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

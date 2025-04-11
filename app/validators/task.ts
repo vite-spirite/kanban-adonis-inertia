@@ -21,3 +21,14 @@ export const TaskCreateValidator = vine.compile(
         categoryId: vine.number().positive(),
     })
 )
+
+export const TaskTagEditingValidator = vine.compile(
+    vine.object({
+        tags: vine.array(
+            vine.object({
+                id: vine.number().positive(),
+                order: vine.number().positive(),
+            })
+        ),
+    })
+)

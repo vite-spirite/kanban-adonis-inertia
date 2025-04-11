@@ -40,7 +40,7 @@
         >
             <template #item="{ element: task }">
                 <div class="w-full">
-                    <ProjectTaskCard :task="task as TaskDto" />
+                    <ProjectTaskCard :task="task as TaskDto" :project-id="category.projectId" />
                 </div>
             </template>
             <template #footer>
@@ -61,7 +61,7 @@
 import type { CategoryDto } from '#types/category.dto'
 import type { TaskDto } from '#types/task.dto'
 
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { PlusCircleIcon } from '@heroicons/vue/24/outline'
 import ProjectTaskCard from '~/components/projects/task.vue'
@@ -69,6 +69,8 @@ import ProjectCategoryEdit from '~/components/projects/editing/edit_category_dat
 import ProjectCreateTask from '~/components/projects/editing/create_task.vue'
 
 import draggable from 'vuedraggable'
+import { type Subscription } from '@adonisjs/transmit-client'
+import { transmit } from '~/utils/transmit'
 
 const { category } = defineProps<{
     category: CategoryDto
@@ -89,4 +91,28 @@ const createTaskDialog = ref<boolean>(false)
 const onTaskChange = async (e: any) => {
     emit('taskChanged', category, e)
 }
+
+let subscription: null | Subscription = null
+
+onMounted(async () => {
+    subscription = transmit.instance.subscription(
+        `/projects/${category.projectId}/category/${category.id}/tasks`
+    )
+    await subscription.create()
+
+    subscription.onMessage((data: { type: 'task.updated'; task: TaskDto }) => {
+        if (data.type === 'task.updated') {
+            const taskIdx = category.tasks.findIndex((task) => task.id === data.task.id)
+            if (taskIdx !== -1) {
+                category.tasks[taskIdx] = data.task
+            }
+        }
+    })
+})
+
+onUnmounted(async () => {
+    if (subscription) {
+        await subscription.delete()
+    }
+})
 </script>
