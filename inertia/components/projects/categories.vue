@@ -46,16 +46,6 @@ const { projectId, allowEditing, allowDeleting } = defineProps<{
     allowDeletingTask: boolean
 }>()
 
-const createTaskDialog = ref(false)
-const createTaskCategory = ref(-1)
-const createTaskOrder = ref(0)
-
-const addTaskClick = (category: CategoryDto) => {
-    createTaskCategory.value = category.id
-    createTaskOrder.value = category.tasks.length
-    createTaskDialog.value = true
-}
-
 const categories = defineModel<CategoryDto[]>({ required: true })
 const categoryChangedIds = ref<number[]>([])
 const taskChangedIds = ref<number[]>([])
