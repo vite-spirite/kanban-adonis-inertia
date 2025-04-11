@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import Project from '#models/project'
 import Task from '#models/task'
@@ -36,6 +37,33 @@ export class TaskService {
                 .preload('tasks', (s) => {
                     s.orderBy('order', 'asc')
                 })
+        })
+    }
+
+    async create(
+        project: Project,
+        payload: {
+            categoryId: number
+            order: number
+            name: string
+            description: string
+            dueDate?: string
+        }
+    ) {
+        const category =
+            project.categories.find((c) => c.id === payload.categoryId) ??
+            (await project.related('categories').query().where('id', payload.categoryId).first())
+
+        if (!category) {
+            return null
+        }
+
+        return category.related('tasks').create({
+            categoryId: payload.categoryId,
+            order: payload.order,
+            name: payload.name,
+            description: payload.description,
+            dueDate: payload.dueDate ? DateTime.fromISO(payload.dueDate) : undefined,
         })
     }
 }

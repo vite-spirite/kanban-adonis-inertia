@@ -1,7 +1,5 @@
 <template>
     <div class="flex flex-row justify-start items-stretch space-x-4 h-full overflow-auto">
-        <!--        <div class="min-w-xs max-w-xs w-full"></div>-->
-
         <draggable
             v-model="categories"
             item-key="id"
@@ -11,59 +9,37 @@
             :disabled="!allowSorting || isSaved"
         >
             <template #item="{ element: category }">
-                <div
-                    class="min-w-md max-w-md w-full flex flex-col justify-start items-start hover:bg-gray-50 transition group"
-                >
-                    <div
-                        class="flex flex-row justify-start items-center p-4 w-full border-b border-gray-200 group-hover:border-gray-900 transition"
-                    >
-                        <div
-                            class="rounded-full size-4 mr-2"
-                            :style="{ 'background-color': category.color }"
-                        ></div>
-                        <h2 class="text-xl font-semibold text-gray-800 flex-1">
-                            {{ category.name }}
-                        </h2>
-
-                        <ProjectCategoryEdit
-                            :category="category"
-                            :allow-delete="allowDeleting"
-                            :allow-edit="allowEditing"
-                            v-if="allowDeleting || allowEditing"
-                        />
-                    </div>
-
-                    <draggable
-                        v-model="category.tasks"
-                        item-key="id"
-                        group="tasks"
-                        @change="(e) => onTaskChange(category, e)"
-                        class="flex flex-col justify-start items-start flex-1 h-full space-y-2 w-full p-2"
-                        :disabled="isTaskChangeSaved || !allowTaskSorting"
-                    >
-                        <template #item="{ element: task }">
-                            <div class="w-full rounded-lg border border-gray-200 bg-gray-100 p-4">
-                                <h1>{{ task.name }}</h1>
-                                <pre>{{ task }}</pre>
-                            </div>
-                        </template>
-                    </draggable>
-                </div>
+                <ProjectCategory
+                    :category="category"
+                    :project-id="projectId"
+                    :allow-deleting-task="allowDeletingTask"
+                    :allow-editing-task="allowEditingTask"
+                    :allow-creating-task="allowCreatingTask"
+                    :allow-task-sorting="allowTaskSorting"
+                    :allow-editing="allowEditing"
+                    :allow-deleting="allowDeleting"
+                    @task-changed="onTaskChange"
+                />
             </template>
         </draggable>
-
-        <!--        <div class="min-w-xs max-w-xs w-full"></div>-->
     </div>
 </template>
 
 <script lang="ts" setup>
 import type { CategoryDto } from '#types/category.dto'
-import { ref } from 'vue'
-import draggable from 'vuedraggable'
+import type { TaskDto } from '#types/task.dto'
+
+import { PlusCircleIcon } from '@heroicons/vue/24/outline'
+import { onMounted, ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 
 import ProjectCategoryEdit from '~/components/projects/editing/edit_category_data.vue'
+import ProjectTaskCard from '~/components/projects/task.vue'
+import ProjectCreateTask from '~/components/projects/editing/create_task.vue'
+import ProjectCategory from '~/components/projects/category.vue'
+import draggable from 'vuedraggable'
+import { transmit } from '~/utils/transmit'
 
 const { projectId, allowEditing, allowDeleting } = defineProps<{
     projectId: number
@@ -71,7 +47,20 @@ const { projectId, allowEditing, allowDeleting } = defineProps<{
     allowEditing: boolean
     allowDeleting: boolean
     allowTaskSorting: boolean
+    allowCreatingTask: boolean
+    allowEditingTask: boolean
+    allowDeletingTask: boolean
 }>()
+
+const createTaskDialog = ref(false)
+const createTaskCategory = ref(-1)
+const createTaskOrder = ref(0)
+
+const addTaskClick = (category: CategoryDto) => {
+    createTaskCategory.value = category.id
+    createTaskOrder.value = category.tasks.length
+    createTaskDialog.value = true
+}
 
 const categories = defineModel<CategoryDto[]>({ required: true })
 const categoryChangedIds = ref<number[]>([])
@@ -141,9 +130,9 @@ const submitChangeDebounced = useDebounceFn(async () => {
             isSaved.value = false
         },
     })
-}, 2000)
+}, 500)
 
-const onTaskChange = async (category: CategoryDto, e: any) => {
+const onTaskChange = async (_: CategoryDto, e: any) => {
     if (!e.moved && !e.added && !e.removed) return
 
     if (e.moved) {
@@ -184,5 +173,5 @@ const submitTasksChangeDebounced = useDebounceFn(async () => {
             isTaskChangeSaved.value = false
         },
     })
-}, 2000)
+}, 500)
 </script>

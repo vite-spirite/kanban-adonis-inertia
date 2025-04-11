@@ -158,7 +158,7 @@
 
     <div class="rounded-md relative overflow-hidden flex flex-row justify-start items-stretch">
         <div
-            class="absolute opacity-20 top-0 left-0 w-full h-full"
+            class="absolute opacity-20 top-0 left-0 w-full h-full transition-all duration-300"
             :style="{ 'background-color': tag.color }"
         ></div>
 

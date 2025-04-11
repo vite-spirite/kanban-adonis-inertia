@@ -6,20 +6,20 @@ export class TaskPresenter {
     declare name: string
     declare description: string
     declare order: number
-    declare due_date: string | null
-    declare category_id: number
-    declare created_at: string
-    declare updated_at: string
+    declare dueDate: string | null
+    declare categoryId: number
+    declare createdAt: string
+    declare updatedAt: string
 
     constructor(task: Task) {
         this.id = task.id
         this.name = task.name
         this.description = task.description
         this.order = task.order
-        this.due_date = task.dueDate ? task.dueDate.toString() : null
-        this.category_id = task.categoryId
-        this.created_at = task.createdAt.toString()
-        this.updated_at = task.updatedAt.toString()
+        this.dueDate = task.dueDate ? task.dueDate.toString() : null
+        this.categoryId = task.categoryId
+        this.createdAt = task.createdAt.toString()
+        this.updatedAt = task.updatedAt.toString()
     }
 
     present(): TaskDto {
@@ -28,10 +28,10 @@ export class TaskPresenter {
             name: this.name,
             description: this.description,
             order: this.order,
-            due_date: this.due_date,
-            category_id: this.category_id,
-            created_at: this.created_at,
-            updated_at: this.updated_at,
+            dueDate: this.dueDate,
+            categoryId: this.categoryId,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
         }
     }
 }

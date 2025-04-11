@@ -18,23 +18,36 @@
                 <div class="flex flex-col justify-items-start items-start space-y-4">
                     <h3 class="font-semibold text-lg text-gray-800">Tags:</h3>
 
-                    <div class="flex flex-row justify-start items-center gap-2 flex-wrap">
-                        <ProjectTag
-                            v-for="tag in tags"
-                            :key="`project_${pageProps.project.id}_tag_${tag.id}_editable`"
-                            :tag="tag"
-                            :editable="can(pageProps.capabilities, Permissions.PROJECT_TAG_EDIT)"
-                            :removable="can(pageProps.capabilities, Permissions.PROJECT_TAG_DELETE)"
-                        />
-                        <button
-                            v-if="can(pageProps.capabilities, Permissions.PROJECT_TAG_CREATE)"
-                            class="font-medium text-sm px-2 py-1 inline-flex flex-row justify-center items-center space-x-1 rounded-md bg-transparent border-2 border-dashed border-gray-200 text-gray-950 hover:bg-blue-500 hover:text-gray-50 hover:border-transparent transition duration-75 cursor-pointer"
-                            @click.prevent="tagCreateDialog = true"
-                        >
-                            <PlusIcon class="size-4" />
-                            <span class="inline-block">Create tag</span>
-                        </button>
-                    </div>
+                    <vuedraggable
+                        :list="tags"
+                        :group="{ name: 'task_tag', put: true, pull: 'clone' }"
+                        item-key="id"
+                        class="flex flex-row justify-start items-center gap-2 flex-wrap"
+                        @change="removeAddedTagByDraggable"
+                    >
+                        <template #item="{ element: tag }">
+                            <div class="cursor-move">
+                                <ProjectTag
+                                    :tag="tag"
+                                    :editable="
+                                        can(pageProps.capabilities, Permissions.PROJECT_TAG_EDIT)
+                                    "
+                                    :removable="
+                                        can(pageProps.capabilities, Permissions.PROJECT_TAG_DELETE)
+                                    "
+                                />
+                            </div>
+                        </template>
+                    </vuedraggable>
+
+                    <button
+                        v-if="can(pageProps.capabilities, Permissions.PROJECT_TAG_CREATE)"
+                        class="font-medium text-sm px-2 py-1 inline-flex flex-row justify-center items-center space-x-1 rounded-md bg-transparent border-2 border-dashed border-gray-200 text-gray-950 hover:bg-blue-500 hover:text-gray-50 hover:border-transparent transition duration-75 cursor-pointer"
+                        @click.prevent="tagCreateDialog = true"
+                    >
+                        <PlusIcon class="size-4" />
+                        <span class="inline-block">Create tag</span>
+                    </button>
                 </div>
 
                 <div class="flex flex-col justify-items-start items-start space-y-4 mt-6">
@@ -64,6 +77,9 @@
                 :allow-editing="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_EDIT)"
                 :allow-deleting="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_DELETE)"
                 :allow-task-sorting="can(pageProps.capabilities, Permissions.PROJECT_TASK_ORDER)"
+                :allow-creating-task="can(pageProps.capabilities, Permissions.PROJECT_TASK_CREATE)"
+                :allow-editing-task="can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)"
+                :allow-deleting-task="can(pageProps.capabilities, Permissions.PROJECT_TASK_DELETE)"
             />
         </div>
     </div>
@@ -79,6 +95,7 @@ import { usePage, Head } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import { Subscription, Transmit } from '@adonisjs/transmit-client'
+import { transmit } from '~/utils/transmit'
 
 import ProjectHeader from '~/components/projects/header.vue'
 import ProjectCategory from '~/components/projects/categories.vue'
@@ -87,6 +104,7 @@ import { Permissions } from '~/utils/permission_enum'
 
 import { PlusIcon } from '@heroicons/vue/24/solid'
 
+import vuedraggable from 'vuedraggable'
 import ProjectTag from '~/components/projects/tag.vue'
 import ProjectTagCreateDialog from '~/components/projects/editing/create_tag_dialog.vue'
 
@@ -109,15 +127,11 @@ watch(
 )
 
 onMounted(async () => {
-    const transmit = new Transmit({
-        baseUrl: window.location.origin,
-    })
-
-    categorySubscription = transmit.subscription(
+    categorySubscription = transmit.instance.subscription(
         `/projects/${pageProps.value.project.id}/categories`
     )
 
-    tagSubscription = transmit.subscription(`/projects/${pageProps.value.project.id}/tags`)
+    tagSubscription = transmit.instance.subscription(`/projects/${pageProps.value.project.id}/tags`)
 
     await categorySubscription.create()
     await tagSubscription.create()
@@ -198,4 +212,10 @@ onBeforeUnmount(async () => {
         await tagSubscription.delete()
     }
 })
+
+const removeAddedTagByDraggable = (e: any) => {
+    if (e.added) {
+        tags.value.splice(e.added.newIndex, 1)
+    }
+}
 </script>

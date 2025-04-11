@@ -51,7 +51,8 @@ import type UsersController from '#controllers/users_controller'
 import type { InviteDto } from '#types/invite.dto'
 
 import { DateTime } from 'luxon'
-import { type Subscription, Transmit } from '@adonisjs/transmit-client'
+import { type Subscription } from '@adonisjs/transmit-client'
+import { transmit } from '~/utils/transmit'
 
 const page = usePage<InferPageProps<UsersController, 'showInvite'>>()
 const pageProps = computed(() => page.props)
@@ -68,11 +69,7 @@ onMounted(async () => {
         return
     }
 
-    const transmit = new Transmit({
-        baseUrl: window.location.origin,
-    })
-
-    subscription = transmit.subscription(`/user/${pageProps.value.user.id}/invites`)
+    subscription = transmit.instance.subscription(`/user/${pageProps.value.user.id}/invites`)
     await subscription.create()
 
     subscription.onMessage<{ type: 'add' | 'delete'; invite: InviteDto }>((data) => {

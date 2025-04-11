@@ -16,10 +16,13 @@
 import type { SharedProps } from '@adonisjs/inertia/types'
 import { usePage } from '@inertiajs/vue3'
 import dashboardNavigation from '~/components/dashboard_navigation.vue'
-import { computed } from 'vue'
+import { computed, onBeforeMount, onBeforeUnmount, onMounted } from 'vue'
+import { transmit } from '~/utils/transmit'
 
 const page = usePage<SharedProps & { [key: string]: any }>()
 const pageProps = computed(() => page.props)
 
-console.log(pageProps.value.projects)
+onBeforeMount(() => {
+    transmit.createInstance(window.location.origin)
+})
 </script>
