@@ -1,6 +1,7 @@
 <template>
     <div
         class="w-full rounded-lg border-1 border-gray-200 p-4 shadow-none hover:shadow-md transition"
+        @click="clickTask"
     >
         <vuedraggable
             class="flex flex-row justify-start items-start gap-2 w-full flex-wrap min-h-[5px]"
@@ -8,6 +9,7 @@
             v-model="tags"
             item-key="id"
             @change="onTagChanged"
+            :disabled="!editable"
         >
             <template #item="{ element: tag }">
                 <div>
@@ -38,16 +40,15 @@ import type { TagDto } from '#types/tag.dto'
 
 import { DateTime } from 'luxon'
 import { computed, ref, watch } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { router, useForm } from '@inertiajs/vue3'
 import { ClockIcon } from '@heroicons/vue/24/outline'
 
 import Tag from '~/components/projects/tag.vue'
 import vuedraggable from 'vuedraggable'
 import { useDebounceFn } from '@vueuse/core'
 
-const { task, projectId } = defineProps<{ task: TaskDto; projectId: number }>()
-
-const tags = ref<TaskDto[]>(task.tags)
+const { task, projectId } = defineProps<{ task: TaskDto; projectId: number; editable: boolean }>()
+const tags = ref<TagDto[]>(task.tags ?? [])
 
 watch(
     () => task.tags,
@@ -69,6 +70,8 @@ const tagForm = useForm<{ tags: { id: number; order: number }[] }>({
 })
 
 const onTagChanged = async (e: any) => {
+    console.log(e)
+
     if (e.added) {
         const tag = e.added.element as TagDto
         const tagWithoutAdded = [...tags.value]
@@ -108,11 +111,22 @@ const saveTagChangedDebounced = useDebounceFn(async () => {
 
     tagForm.tags = data
 
-    await tagForm.post(`/dashboard/projects/${projectId}/tasks/${task.id}/tags`, {
+    tagForm.post(`/dashboard/projects/${projectId}/tasks/${task.id}/tags`, {
         preserveState: true,
         onSuccess: () => {
             tagChangedIds.value = []
         },
     })
 }, 1000)
+
+const clickTask = () => {
+    router.get(
+        `/dashboard/projects/${projectId}/tasks/${task.id}`,
+        {},
+        {
+            preserveState: true,
+            preserveScroll: true,
+        }
+    )
+}
 </script>

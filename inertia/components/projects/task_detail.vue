@@ -1,0 +1,301 @@
+<template>
+    <Head :title="`${task.name}`" />
+
+    <TransitionRoot appear :show="show" as="template">
+        <Dialog as="div" @close="emit('close')" class="relative z-10">
+            <TransitionChild
+                as="template"
+                enter="duration-300 ease-out"
+                enter-from="opacity-0"
+                enter-to="opacity-100"
+                leave="duration-200 ease-in"
+                leave-from="opacity-100"
+                leave-to="opacity-0"
+            >
+                <div class="fixed inset-0 bg-black/25" />
+            </TransitionChild>
+
+            <div class="fixed inset-0 overflow-y-auto">
+                <div class="flex min-h-full items-center justify-center p-4 text-center">
+                    <TransitionChild
+                        as="template"
+                        enter="duration-300 ease-out"
+                        enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100"
+                        leave="duration-200 ease-in"
+                        leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95"
+                    >
+                        <DialogPanel
+                            class="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all"
+                        >
+                            <DialogTitle
+                                as="div"
+                                class="text-lg leading-6 font-medium text-gray-900 p-6 w-full border-b-2 border-gray-200 flex flex-row justify-start items-center space-x-6"
+                            >
+                                <ServerIcon class="h-6 w-6 text-gray-500" />
+
+                                <div
+                                    class="flex flex-col justify-start items-start space-y-2 w-full"
+                                >
+                                    <input
+                                        type="text"
+                                        class="m-0 p-0 text-xl font-medium bg-none focus:outline-blue-500 transition border-none w-full rounded-md"
+                                        v-model="taskForm.name"
+                                        :disabled="!allowEditable"
+                                        @change="saveTaskDebounced"
+                                    />
+                                    <h5 class="text-sm text-gray-800 font-normal">
+                                        in {{ task.category?.name }}
+                                    </h5>
+                                </div>
+                            </DialogTitle>
+
+                            <div class="flex flex-row justify-start items-stretch space-x-6 h-full">
+                                <div
+                                    class="flex flex-col justify-start items-start space-y-6 flex-1 p-4"
+                                >
+                                    <div
+                                        class="flex flex-col justify-start items-start space-y-2"
+                                        v-if="task.dueDate"
+                                    >
+                                        <div
+                                            class="flex flex-row justify-start items-center text-gray-600 space-x-2"
+                                        >
+                                            <ClockIcon class="h-6 w-6" />
+                                            <h4 class="m-0 p-0 font-semibold text-lg">Dates</h4>
+                                        </div>
+                                        <div
+                                            class="flex flex-row justify-start items-center flex-wrap pl-8 gap-1"
+                                        >
+                                            <span class="text-sm text-gray-500 font-normal">
+                                                {{ computeDate(task.createdAt) }}
+                                            </span>
+                                            <span class="text-sm text-gray-500 font-normal">
+                                                - {{ computeDate(task.dueDate) }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="flex flex-col justify-start items-start space-y-2 w-full"
+                                    >
+                                        <div
+                                            class="flex flex-row justify-start items-center text-gray-600 space-x-2"
+                                        >
+                                            <TagIcon class="h-6 w-6" />
+                                            <h4 class="m-0 p-0 font-semibold text-lg">Tags</h4>
+                                        </div>
+                                        <vuedraggable
+                                            class="flex flex-row justify-start items-start gap-2 w-full flex-wrap min-h-[5px] pl-8"
+                                            group="task_tag"
+                                            v-model="currentTask.tags"
+                                            item-key="id"
+                                            :disabled="!allowEditable"
+                                            @change="onTagChanged"
+                                        >
+                                            <template #item="{ element: tag }">
+                                                <div>
+                                                    <Tag
+                                                        :tag="tag"
+                                                        :editable="false"
+                                                        :removable="false"
+                                                    />
+                                                </div>
+                                            </template>
+                                        </vuedraggable>
+                                    </div>
+
+                                    <div
+                                        class="flex flex-col justify-start items-start space-y-2 w-full"
+                                    >
+                                        <div
+                                            class="flex flex-row justify-start items-center space-x-2 text-gray-600 w-full"
+                                        >
+                                            <Bars3CenterLeftIcon class="h-6 w-6" />
+                                            <h4 class="m-0 p-0 font-semibold text-lg">
+                                                Description
+                                            </h4>
+                                        </div>
+
+                                        <textarea
+                                            ref="descriptionTextareaReference"
+                                            v-model="taskForm.description"
+                                            class="text-sm text-gray-500 font-normal ml-8 w-full resize-y focus:outline-blue-500 transition h-full"
+                                            :disabled="!allowEditable"
+                                            @change="saveTaskDebounced"
+                                            @input="adjustTextareaHeight"
+                                        >
+                                        </textarea>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex flex-col justify-start items-start w-1/3 bg-gray-200 p-4"
+                                >
+                                    <div
+                                        class="flex flex-col justify-start items-start space-y-2 w-full"
+                                    >
+                                        <div
+                                            class="flex flex-row justify-start items-center text-gray-600 space-x-2"
+                                        >
+                                            <TagIcon class="size-4" />
+                                            <h4 class="m-0 p-0 font-semibold text-sm">Edit tags</h4>
+                                        </div>
+                                        <TagDraggable
+                                            :tags="tags"
+                                            :allow-editable="false"
+                                            :allow-deletable="false"
+                                            :allow-draggable="allowEditable"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+                </div>
+            </div>
+        </Dialog>
+    </TransitionRoot>
+</template>
+
+<script lang="ts" setup>
+import type { TaskDto } from '#types/task.dto'
+import type { TagDto } from '#types/tag.dto'
+
+import { nextTick, onMounted, ref, watch } from 'vue'
+import { DateTime } from 'luxon'
+import { Head, useForm } from '@inertiajs/vue3'
+import { Dialog, TransitionRoot, TransitionChild, DialogTitle, DialogPanel } from '@headlessui/vue'
+import { ServerIcon, Bars3CenterLeftIcon, TagIcon, ClockIcon } from '@heroicons/vue/24/outline'
+
+import vuedraggable from 'vuedraggable'
+import Tag from '~/components/projects/tag.vue'
+import TagDraggable from '~/components/projects/tag_draggable.vue'
+import { useDebounceFn } from '@vueuse/core'
+import { Subscription } from '@adonisjs/transmit-client'
+import { transmit } from '~/utils/transmit'
+
+const { task } = defineProps<{ task: TaskDto; tags: TagDto[]; allowEditable: boolean }>()
+const emit = defineEmits<{ (e: 'close'): void }>()
+
+const currentTask = ref<TaskDto>(task)
+const show = ref(true)
+
+const computeDate = (d: string) => {
+    const date = DateTime.fromISO(d)
+    return date.isValid ? date.toFormat('ff') : 'No due date'
+}
+
+let subscription: Subscription | null = null
+
+const tagChangedIds = ref<number[]>([])
+const tagForm = useForm<{ tags: { id: number; order: number }[] }>({
+    tags: [],
+})
+
+const taskForm = useForm<{
+    name: string
+    description: string
+}>({
+    name: currentTask.value.name,
+    description: currentTask.value.description,
+})
+
+const descriptionTextareaReference = ref<HTMLTextAreaElement | null>(null)
+
+const adjustTextareaHeight = () => {
+    if (descriptionTextareaReference.value) {
+        descriptionTextareaReference.value.style.height = 'auto'
+        descriptionTextareaReference.value.style.height = `${descriptionTextareaReference.value.scrollHeight}px`
+    }
+}
+
+const onTagChanged = async (e: any) => {
+    if (e.added) {
+        const tag = e.added.element as TagDto
+        const tagWithoutAdded = [...currentTask.value.tags]
+        tagWithoutAdded.splice(e.added.newIndex, 1)
+
+        if (tagWithoutAdded.find((t) => t.id === tag.id)) {
+            currentTask.value.tags.splice(e.added.newIndex, 1)
+
+            return
+        }
+
+        tagChangedIds.value.push(e.added.element.id)
+    }
+
+    if (e.removed) {
+        tagChangedIds.value.push(e.removed.element.id)
+    }
+
+    if (e.moved) {
+        tagChangedIds.value.push(e.moved.element.id)
+    }
+
+    await saveTagChangedDebounced()
+}
+
+const saveTagChangedDebounced = useDebounceFn(async () => {
+    if (tagChangedIds.value.length === 0) return
+
+    const data: { id: number; order: number }[] = []
+
+    currentTask.value.tags.forEach((tag, index) => {
+        data.push({
+            id: tag.id,
+            order: index,
+        })
+    })
+
+    tagForm.tags = data
+
+    tagForm.post(`/dashboard/projects/${task.category?.projectId}/tasks/${task.id}/tags`, {
+        preserveState: true,
+        onSuccess: () => {
+            tagChangedIds.value = []
+        },
+    })
+}, 1000)
+
+onMounted(async () => {
+    subscription = transmit.instance.subscription(
+        `/projects/${task.category?.projectId}/task/${task.id}/details`
+    )
+
+    await subscription.create()
+
+    subscription.onMessage<{ type: 'task.updated'; task: TaskDto }>((data) => {
+        if (data.type === 'task.updated') {
+            currentTask.value = data.task
+
+            taskForm.name = data.task.name
+            taskForm.description = data.task.description
+
+            nextTick(() => {
+                adjustTextareaHeight()
+            })
+        }
+    })
+
+    adjustTextareaHeight()
+})
+
+const saveTaskDebounced = useDebounceFn(() => {
+    if (
+        taskForm.name === currentTask.value.name &&
+        taskForm.description === currentTask.value.description
+    ) {
+        return
+    }
+
+    taskForm.put(`/dashboard/projects/${task.category?.projectId}/tasks/${task.id}`, {
+        preserveState: true,
+        onSuccess: () => {
+            currentTask.value.name = taskForm.name
+            currentTask.value.description = taskForm.description
+        },
+    })
+}, 1000)
+</script>

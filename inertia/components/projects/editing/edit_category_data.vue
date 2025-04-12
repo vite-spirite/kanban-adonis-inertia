@@ -1,7 +1,7 @@
 <template>
-    <Menu as="div" class="relative inline-block text-left">
+    <Menu as="div" class="relative inline-block text-left z-90">
         <TransitionRoot v-if="allowEdit" appear :show="openEditModal" as="template">
-            <Dialog as="div" @close="openEditModal = false" class="relative z-50">
+            <Dialog as="div" @close="openEditModal = false" class="relative">
                 <TransitionChild
                     as="template"
                     enter="duration-300 ease-out"

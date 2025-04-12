@@ -71,9 +71,11 @@ router
         router.put('/projects/:id/tags', [ProjectTagController, 'edit'])
         router.delete('/projects/:id/tags/:tagId', [ProjectTagController, 'delete'])
 
+        router.get('/projects/:id/tasks/:taskId', [DashboardController, 'task'])
         router.post('/projects/:id/tasks/order', [ProjectTaskController, 'reorder'])
         router.post('/projects/:id/tasks', [ProjectTaskController, 'create'])
         router.post('/projects/:id/tasks/:taskId/tags', [ProjectTaskController, 'updateTags'])
+        router.put('/projects/:id/tasks/:taskId', [ProjectTaskController, 'update'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

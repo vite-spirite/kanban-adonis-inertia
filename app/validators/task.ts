@@ -32,3 +32,11 @@ export const TaskTagEditingValidator = vine.compile(
         ),
     })
 )
+
+export const TaskUpdateValidator = vine.compile(
+    vine.object({
+        name: vine.string().maxLength(255).minLength(1).optional(),
+        description: vine.string().optional(),
+        dueDate: vine.string().optional(),
+    })
+)

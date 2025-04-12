@@ -1,5 +1,13 @@
 <template>
-    <Head :title="pageProps.project.name" />
+    <Head v-if="!pageProps.task" :title="pageProps.project.name" />
+
+    <ProjectTaskDialog
+        v-if="pageProps.task"
+        @close="onTaskDetailClose"
+        :task="pageProps.task as TaskDto"
+        :tags="pageProps.project.tags || []"
+        :allow-editable="can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)"
+    />
 
     <div class="flex flex-col w-full max-w-screen">
         <ProjectHeader :project="pageProps.project" :capabilities="pageProps.capabilities" />
@@ -18,28 +26,16 @@
                 <div class="flex flex-col justify-items-start items-start space-y-4">
                     <h3 class="font-semibold text-lg text-gray-800">Tags:</h3>
 
-                    <vuedraggable
-                        :list="tags"
-                        :group="{ name: 'task_tag', put: true, pull: 'clone' }"
-                        item-key="id"
-                        class="flex flex-row justify-start items-center gap-2 flex-wrap"
-                        @change="removeAddedTagByDraggable"
-                        :disabled="!can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)"
-                    >
-                        <template #item="{ element: tag }">
-                            <div class="cursor-default">
-                                <ProjectTag
-                                    :tag="tag"
-                                    :editable="
-                                        can(pageProps.capabilities, Permissions.PROJECT_TAG_EDIT)
-                                    "
-                                    :removable="
-                                        can(pageProps.capabilities, Permissions.PROJECT_TAG_DELETE)
-                                    "
-                                />
-                            </div>
-                        </template>
-                    </vuedraggable>
+                    <TagDraggable
+                        :tags="tags"
+                        :allow-editable="can(pageProps.capabilities, Permissions.PROJECT_TAG_EDIT)"
+                        :allow-deletable="
+                            can(pageProps.capabilities, Permissions.PROJECT_TAG_DELETE)
+                        "
+                        :allow-draggable="
+                            can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)
+                        "
+                    />
 
                     <button
                         v-if="can(pageProps.capabilities, Permissions.PROJECT_TAG_CREATE)"
@@ -91,11 +87,12 @@ import type { InferPageProps } from '@adonisjs/inertia/types'
 import type DashboardController from '#controllers/dashboard_controller'
 import type { CategoryDto } from '#types/category.dto'
 import type { TagDto } from '#types/tag.dto'
+import type { TaskDto } from '#types/task.dto'
 
-import { usePage, Head } from '@inertiajs/vue3'
+import { usePage, Head, router } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { ref } from 'vue'
-import { Subscription, Transmit } from '@adonisjs/transmit-client'
+import { Subscription } from '@adonisjs/transmit-client'
 import { transmit } from '~/utils/transmit'
 
 import ProjectHeader from '~/components/projects/header.vue'
@@ -105,20 +102,28 @@ import { Permissions } from '~/utils/permission_enum'
 
 import { PlusIcon } from '@heroicons/vue/24/solid'
 
-import vuedraggable from 'vuedraggable'
-import ProjectTag from '~/components/projects/tag.vue'
 import ProjectTagCreateDialog from '~/components/projects/editing/create_tag_dialog.vue'
+import ProjectTaskDialog from '~/components/projects/task_detail.vue'
+import TagDraggable from '~/components/projects/tag_draggable.vue'
 
 let categorySubscription: Subscription | null = null
 let tagSubscription: Subscription | null = null
 
-const page = usePage<InferPageProps<DashboardController, 'project'>>()
+const page = usePage<InferPageProps<DashboardController, 'project' | 'task'>>()
 const pageProps = computed(() => page.props)
 
 const categories = ref<CategoryDto[]>(pageProps.value.project.categories ?? [])
 const tags = ref<TagDto[]>(pageProps.value.project.tags ?? [])
 
 const tagCreateDialog = ref(false)
+
+const onTaskDetailClose = () => {
+    router.get(
+        `/dashboard/projects/${pageProps.value.project.id}`,
+        {},
+        { preserveState: true, preserveScroll: true }
+    )
+}
 
 watch(
     () => pageProps.value.project.categories,
@@ -213,10 +218,4 @@ onBeforeUnmount(async () => {
         await tagSubscription.delete()
     }
 })
-
-const removeAddedTagByDraggable = (e: any) => {
-    if (e.added) {
-        tags.value.splice(e.added.newIndex, 1)
-    }
-}
 </script>

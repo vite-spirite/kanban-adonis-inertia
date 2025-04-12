@@ -20,7 +20,7 @@ export default class Task extends BaseModel {
     @column()
     declare description: string
 
-    @belongsTo(() => ProjectCategory, { localKey: 'categoryId', foreignKey: 'id' })
+    @belongsTo(() => ProjectCategory, { foreignKey: 'categoryId', localKey: 'id' })
     declare category: BelongsTo<typeof ProjectCategory>
 
     @manyToMany(() => ProjectTag, {

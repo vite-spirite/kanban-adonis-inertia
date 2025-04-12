@@ -12,6 +12,14 @@ export class TaskService {
             .first()
     }
 
+    async findByIdWithDetails(id: number): Promise<Task | null> {
+        return Task.query()
+            .preload('tags', (s) => s.orderBy('order', 'asc'))
+            .preload('category')
+            .where('id', id)
+            .first()
+    }
+
     async reorder(project: Project, payload: { id: number; categoryId: number; order: number }[]) {
         return await db.transaction(async (trx) => {
             const categories =
@@ -76,7 +84,7 @@ export class TaskService {
     }
 
     async updateTags(task: Task, payload: { id: number; order: number }[]) {
-        const synchronizeArray = {}
+        const synchronizeArray: Record<number, { order: number }> = {}
 
         for (const tag of payload) {
             synchronizeArray[tag.id] = { order: tag.order }
@@ -87,5 +95,14 @@ export class TaskService {
         await task.related('tags').sync(synchronizeArray, true)
 
         return this.findById(task.id)
+    }
+
+    async update(task: Task, payload: { name?: string; description?: string; dueDate?: string }) {
+        return task
+            .merge({
+                ...payload,
+                dueDate: payload.dueDate ? DateTime.fromISO(payload.dueDate) : undefined,
+            })
+            .save()
     }
 }

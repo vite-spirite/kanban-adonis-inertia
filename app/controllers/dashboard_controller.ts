@@ -6,10 +6,15 @@ import { ProjectPresenter } from '#presenters/project_presenter'
 import { PermissionPresenter } from '#presenters/permission_presenter'
 import ProjectPolicy from '#policies/project_policy'
 import { ProjectDto } from '#types/project.dto'
+import { TaskService } from '#services/task_service'
+import { TaskPresenter } from '#presenters/task_presenter'
 
 @inject()
 export default class DashboardController {
-    constructor(private readonly projectService: ProjectService) {}
+    constructor(
+        private readonly projectService: ProjectService,
+        private readonly taskService: TaskService
+    ) {}
 
     async index({ inertia, auth, response }: HttpContext) {
         if (!auth.user) {
@@ -113,6 +118,37 @@ export default class DashboardController {
         return inertia.render('dashboard/project/editing/members', {
             project: projectPresenter.present() as ProjectDto,
             capabilities: capabilitiesPresenter.map((p) => p.present()),
+        })
+    }
+
+    async task({ inertia, bouncer, params, response, auth }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().toRoute('login')
+        }
+
+        const project = await this.projectService.findById(params.id)
+
+        if (!project || (await bouncer.with(ProjectPolicy).denies('read', project))) {
+            return response.redirect().toRoute('home')
+        }
+
+        const presenter = new ProjectPresenter(project)
+
+        const capabilities = await this.projectService.findPermissionByUser(auth.user, project)
+        const capabilitiesPresenter = capabilities.map((capability) =>
+            new PermissionPresenter(capability).present()
+        )
+
+        const task = await this.taskService.findByIdWithDetails(+params.taskId)
+
+        if (!task) {
+            return response.redirect().back()
+        }
+
+        return inertia.render('dashboard/project', {
+            project: presenter.present(),
+            capabilities: capabilitiesPresenter,
+            task: new TaskPresenter(task).present(),
         })
     }
 }

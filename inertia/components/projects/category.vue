@@ -40,7 +40,11 @@
         >
             <template #item="{ element: task }">
                 <div class="w-full">
-                    <ProjectTaskCard :task="task as TaskDto" :project-id="category.projectId" />
+                    <ProjectTaskCard
+                        :task="task as TaskDto"
+                        :project-id="category.projectId"
+                        :editable="allowEditingTask"
+                    />
                 </div>
             </template>
             <template #footer>

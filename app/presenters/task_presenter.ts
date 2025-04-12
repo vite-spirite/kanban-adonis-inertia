@@ -1,6 +1,7 @@
 import Task from '#models/task'
 import { TaskDto } from '#types/task.dto'
 import { TagPresenter } from '#presenters/tag_presenter'
+import { CategoryPresenter } from '#presenters/category_presenter'
 
 export class TaskPresenter {
     declare id: number
@@ -13,6 +14,7 @@ export class TaskPresenter {
     declare updatedAt: string
 
     declare tags: TagPresenter[]
+    declare category?: CategoryPresenter
 
     constructor(task: Task) {
         this.id = task.id
@@ -31,6 +33,10 @@ export class TaskPresenter {
                 return new TagPresenter(tag)
             })
         }
+
+        if (task.category) {
+            this.category = new CategoryPresenter(task.category)
+        }
     }
 
     present(): TaskDto {
@@ -44,6 +50,7 @@ export class TaskPresenter {
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             tags: this.tags.map((tag) => tag.present()),
+            category: this.category?.present(),
         }
     }
 }
