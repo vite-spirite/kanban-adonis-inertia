@@ -9,7 +9,7 @@
         :allow-editable="can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)"
     />
 
-    <div class="flex flex-col w-full max-w-screen">
+    <div class="flex flex-col w-full max-w-screen h-auto min-h-full">
         <ProjectHeader :project="pageProps.project" :capabilities="pageProps.capabilities" />
 
         <ProjectTagCreateDialog
@@ -20,9 +20,9 @@
         />
 
         <div
-            class="flex-1 w-full relative h-full flex flex-row justify-start items-start max-w-screen"
+            class="flex-1 w-full relative h-auto min-h-full flex flex-row justify-start items-start max-w-screen"
         >
-            <div class="w-1/8 p-4 h-full bg-gray-100">
+            <div class="w-1/8 p-4 h-auto min-h-full bg-gray-100">
                 <div class="flex flex-col justify-items-start items-start space-y-4">
                     <h3 class="font-semibold text-lg text-gray-800">Tags:</h3>
 
@@ -67,7 +67,7 @@
             </div>
 
             <ProjectCategory
-                class="flex-1"
+                class="flex-1 min-h-full h-auto"
                 v-model="categories"
                 :project-id="pageProps.project.id"
                 :allow-sorting="can(pageProps.capabilities, Permissions.PROJECT_CATEGORY_ORDER)"

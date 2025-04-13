@@ -1,6 +1,6 @@
 <template>
     <div
-        class="min-w-md max-w-md w-full flex flex-col justify-start items-start hover:bg-gray-50 transition group"
+        class="min-w-md max-w-md w-full flex flex-col justify-start items-start hover:bg-gray-50 transition group h-auto min-h-full"
     >
         <ProjectCreateTask
             :category-id="category.id"
@@ -35,7 +35,7 @@
             item-key="id"
             group="tasks"
             @change="onTaskChange"
-            class="flex flex-col justify-start items-start flex-1 h-full space-y-2 w-full p-2"
+            class="flex flex-col justify-start items-start flex-1 h-auto min-h-full space-y-2 w-full p-2"
             :disabled="!allowTaskSorting"
         >
             <template #item="{ element: task }">

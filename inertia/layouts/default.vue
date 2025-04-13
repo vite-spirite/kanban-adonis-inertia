@@ -6,8 +6,8 @@
             :projects="pageProps.projects"
         />
 
-        <div class="w-full h-full max-w-screen overflow-auto flex flex-1">
-            <slot class="h-full" />
+        <div class="w-full max-h-full max-w-screen overflow-auto flex-1">
+            <slot class="min-h-full h-auto" />
         </div>
     </div>
 </template>
