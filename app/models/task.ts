@@ -32,7 +32,7 @@ export default class Task extends BaseModel {
     declare tags: ManyToMany<typeof ProjectTag>
 
     @column.dateTime()
-    declare dueDate: DateTime
+    declare dueDate: DateTime | null
 
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime

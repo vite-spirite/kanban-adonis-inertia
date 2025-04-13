@@ -4,10 +4,9 @@ import { inject } from '@adonisjs/core'
 import { TaskService } from '#services/task_service'
 import { ProjectService } from '#services/project_service'
 import {
-    TaskCreateValidator,
-    TaskReorderValidator,
-    TaskTagEditingValidator,
-    TaskUpdateValidator,
+	TaskCreateValidator,
+	TaskReorderValidator,
+	TaskTagEditingValidator, TaskUpdateValidator,
 } from '#validators/task'
 import transmit from '@adonisjs/transmit/services/main'
 import { CategoryPresenter } from '#presenters/category_presenter'

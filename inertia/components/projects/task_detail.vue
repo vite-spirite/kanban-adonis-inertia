@@ -57,7 +57,7 @@
                                 >
                                     <div
                                         class="flex flex-col justify-start items-start space-y-2"
-                                        v-if="task.dueDate"
+                                        v-if="taskForm.dueDate"
                                     >
                                         <div
                                             class="flex flex-row justify-start items-center text-gray-600 space-x-2"
@@ -71,9 +71,16 @@
                                             <span class="text-sm text-gray-500 font-normal">
                                                 {{ computeDate(task.createdAt) }}
                                             </span>
-                                            <span class="text-sm text-gray-500 font-normal">
-                                                - {{ computeDate(task.dueDate) }}
-                                            </span>
+
+                                            <span class="text-sm text-gray-500 font-normal">-</span>
+
+                                            <input
+                                                class="text-sm text-gray-500 font-normal"
+                                                id="due-date"
+                                                type="datetime-local"
+                                                v-model="taskForm.dueDate"
+                                                @change="saveTaskDebounced"
+                                            />
                                         </div>
                                     </div>
 
@@ -149,6 +156,45 @@
                                             :allow-draggable="allowEditable"
                                         />
                                     </div>
+
+                                    <div
+                                        class="flex flex-col justify-start items-start space-y-2 w-full mt-4"
+                                    >
+                                        <div class="w-full">
+                                            <h6 class="text-sm font-medium text-gray-900">
+                                                Actions:
+                                            </h6>
+                                        </div>
+
+                                        <button
+                                            class="text-sm font-medium text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
+                                        >
+                                            <span
+                                                class="text-gray-900 h-full w-full inline-block p-2"
+                                                v-if="taskForm.dueDate"
+                                                @click="removeTaskDebounced"
+                                                >Delete deadline</span
+                                            >
+                                            <span
+                                                class="text-gray-900 h-full w-full inline-block p-2"
+                                                v-else
+                                                @click="insertNowDate"
+                                                >Add deadline</span
+                                            >
+                                        </button>
+
+                                        <button
+                                            class="text-sm font-medium p-2 text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
+                                        >
+                                            <span class="text-gray-900">Add list</span>
+                                        </button>
+
+                                        <button
+                                            class="text-sm font-medium p-2 text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
+                                        >
+                                            <span class="text-gray-900">Delete</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </DialogPanel>
@@ -163,7 +209,7 @@
 import type { TaskDto } from '#types/task.dto'
 import type { TagDto } from '#types/tag.dto'
 
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { DateTime } from 'luxon'
 import { Head, useForm } from '@inertiajs/vue3'
 import { Dialog, TransitionRoot, TransitionChild, DialogTitle, DialogPanel } from '@headlessui/vue'
@@ -197,10 +243,24 @@ const tagForm = useForm<{ tags: { id: number; order: number }[] }>({
 const taskForm = useForm<{
     name: string
     description: string
+    dueDate?: string | null
 }>({
     name: currentTask.value.name,
     description: currentTask.value.description,
+    dueDate: currentTask.value.dueDate
+        ? DateTime.fromISO(currentTask.value.dueDate).toFormat("yyyy-MM-dd\'T\'HH:mm")
+        : undefined,
 })
+
+const insertNowDate = () => {
+    taskForm.dueDate = DateTime.now().toFormat("yyyy-MM-dd\'T\'HH:mm")
+    saveTaskDebounced()
+}
+
+const removeTaskDebounced = () => {
+    taskForm.dueDate = null
+    saveTaskDebounced()
+}
 
 const descriptionTextareaReference = ref<HTMLTextAreaElement | null>(null)
 
@@ -279,13 +339,16 @@ onMounted(async () => {
         }
     })
 
-    adjustTextareaHeight()
+    nextTick(() => {
+        adjustTextareaHeight()
+    })
 })
 
 const saveTaskDebounced = useDebounceFn(() => {
     if (
         taskForm.name === currentTask.value.name &&
-        taskForm.description === currentTask.value.description
+        taskForm.description === currentTask.value.description &&
+        taskForm.dueDate === currentTask.value.dueDate
     ) {
         return
     }
@@ -298,4 +361,9 @@ const saveTaskDebounced = useDebounceFn(() => {
         },
     })
 }, 1000)
+
+// TODO: add update field for dueDate
+// TODO: add delete task
+// TODO: add file attachment
+// TODO: add activity logs
 </script>

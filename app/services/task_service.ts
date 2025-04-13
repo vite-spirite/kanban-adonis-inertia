@@ -101,7 +101,7 @@ export class TaskService {
         return task
             .merge({
                 ...payload,
-                dueDate: payload.dueDate ? DateTime.fromISO(payload.dueDate) : undefined,
+                dueDate: payload.dueDate ? DateTime.fromISO(payload.dueDate) : null,
             })
             .save()
     }
