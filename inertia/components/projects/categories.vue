@@ -1,12 +1,12 @@
 <template>
     <div
-        class="flex flex-row justify-start items-stretch space-x-4 min-h-full overflow-x-auto overflow-y-hidden"
+        class="flex flex-row justify-start items-stretch space-x-4 h-auto min-h-full overflow-x-auto overflow-y-hidden"
     >
         <draggable
             v-model="categories"
             item-key="id"
             group="categories"
-            class="flex flex-row justify-start items-stretch flex-1"
+            class="flex flex-row justify-start items-stretch flex-1 min-h-full h-auto"
             @change="onChange"
             :disabled="!allowSorting || isSaved"
         >

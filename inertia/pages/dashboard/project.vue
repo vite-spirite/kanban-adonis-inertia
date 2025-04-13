@@ -20,7 +20,7 @@
         />
 
         <div
-            class="flex-1 w-full relative h-auto min-h-full flex flex-row justify-start items-start max-w-screen"
+            class="flex-1 w-full relative h-auto min-h-full flex flex-row justify-start items-stretch max-w-screen"
         >
             <div class="w-1/8 p-4 h-auto min-h-full bg-gray-100">
                 <div class="flex flex-col justify-items-start items-start space-y-4">
