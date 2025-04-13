@@ -104,11 +104,18 @@ onMounted(async () => {
     )
     await subscription.create()
 
-    subscription.onMessage((data: { type: 'task.updated'; task: TaskDto }) => {
+    subscription.onMessage((data: { type: 'task.updated' | 'task.deleted'; task: TaskDto }) => {
         if (data.type === 'task.updated') {
             const taskIdx = category.tasks.findIndex((task) => task.id === data.task.id)
             if (taskIdx !== -1) {
                 category.tasks[taskIdx] = data.task
+            }
+        }
+
+        if (data.type === 'task.deleted') {
+            const taskIdx = category.tasks.findIndex((task) => task.id === data.task.id)
+            if (taskIdx !== -1) {
+                category.tasks.splice(taskIdx, 1)
             }
         }
     })

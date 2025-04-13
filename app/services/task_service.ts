@@ -16,6 +16,7 @@ export class TaskService {
         return Task.query()
             .preload('tags', (s) => s.orderBy('order', 'asc'))
             .preload('category')
+            .preload('lists')
             .where('id', id)
             .first()
     }
@@ -104,5 +105,9 @@ export class TaskService {
                 dueDate: payload.dueDate ? DateTime.fromISO(payload.dueDate) : null,
             })
             .save()
+    }
+
+    async delete(task: Task): Promise<void> {
+        return task.delete()
     }
 }

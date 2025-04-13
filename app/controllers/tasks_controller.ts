@@ -4,9 +4,10 @@ import { inject } from '@adonisjs/core'
 import { TaskService } from '#services/task_service'
 import { ProjectService } from '#services/project_service'
 import {
-	TaskCreateValidator,
-	TaskReorderValidator,
-	TaskTagEditingValidator, TaskUpdateValidator,
+    TaskCreateValidator,
+    TaskReorderValidator,
+    TaskTagEditingValidator,
+    TaskUpdateValidator,
 } from '#validators/task'
 import transmit from '@adonisjs/transmit/services/main'
 import { CategoryPresenter } from '#presenters/category_presenter'
@@ -22,7 +23,7 @@ export default class TasksController {
         private readonly taskService: TaskService
     ) {}
 
-    private submitSSE(task: Task, project: Project) {
+    private submitUpdateSSE(task: Task, project: Project) {
         transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}/tasks`, {
             type: 'task.updated',
             task: new TaskPresenter(task).present(),
@@ -122,7 +123,7 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        this.submitSSE(taskUpdated, project)
+        this.submitUpdateSSE(taskUpdated, project)
 
         return response.redirect().back()
     }
@@ -154,7 +155,41 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        this.submitSSE(taskUpdated, project)
+        this.submitUpdateSSE(taskUpdated, project)
+
+        return response.redirect().back()
+    }
+
+    async delete({ request, params, auth, bouncer, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(+params.id)
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        const task = await this.taskService.findById(+params.taskId)
+        if (!task) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(TaskPolicy).denies('delete', project)) {
+            return response.redirect().back()
+        }
+
+        await this.taskService.delete(task)
+
+        transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}/tasks`, {
+            type: 'task.deleted',
+            task: new TaskPresenter(task).present(),
+        })
+
+        transmit.broadcast(`/projects/${project.id}/task/${task.id}/details`, {
+            type: 'task.deleted',
+            task: new TaskPresenter(task).present(),
+        })
 
         return response.redirect().back()
     }

@@ -190,9 +190,22 @@
                                         </button>
 
                                         <button
-                                            class="text-sm font-medium p-2 text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
+                                            v-if="allowDeletable"
+                                            class="text-sm font-medium text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
                                         >
-                                            <span class="text-gray-900">Delete</span>
+                                            <span
+                                                v-if="!talkConfirmDelete"
+                                                @click="talkConfirmDelete = true"
+                                                class="text-gray-900 p-2 w-full h-full inline-block"
+                                                >Delete</span
+                                            >
+
+                                            <span
+                                                v-else
+                                                class="text-red-500 p-2 w-full h-full inline-block"
+                                                @click="submitDelete"
+                                                >Sure ?</span
+                                            >
                                         </button>
                                     </div>
                                 </div>
@@ -211,7 +224,7 @@ import type { TagDto } from '#types/tag.dto'
 
 import { nextTick, onMounted, ref } from 'vue'
 import { DateTime } from 'luxon'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, router, useForm } from '@inertiajs/vue3'
 import { Dialog, TransitionRoot, TransitionChild, DialogTitle, DialogPanel } from '@headlessui/vue'
 import { ServerIcon, Bars3CenterLeftIcon, TagIcon, ClockIcon } from '@heroicons/vue/24/outline'
 
@@ -222,11 +235,26 @@ import { useDebounceFn } from '@vueuse/core'
 import { Subscription } from '@adonisjs/transmit-client'
 import { transmit } from '~/utils/transmit'
 
-const { task } = defineProps<{ task: TaskDto; tags: TagDto[]; allowEditable: boolean }>()
+const { task } = defineProps<{
+    task: TaskDto
+    tags: TagDto[]
+    allowEditable: boolean
+    allowDeletable: boolean
+}>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 const currentTask = ref<TaskDto>(task)
 const show = ref(true)
+const talkConfirmDelete = ref(false)
+
+const submitDelete = () => {
+    router.delete(`/dashboard/projects/${task.category?.projectId}/tasks/${task.id}`, {
+        preserveState: true,
+        onSuccess: () => {
+            emit('close')
+        },
+    })
+}
 
 const computeDate = (d: string) => {
     const date = DateTime.fromISO(d)
@@ -326,7 +354,7 @@ onMounted(async () => {
 
     await subscription.create()
 
-    subscription.onMessage<{ type: 'task.updated'; task: TaskDto }>((data) => {
+    subscription.onMessage<{ type: 'task.updated' | 'task.deleted'; task: TaskDto }>((data) => {
         if (data.type === 'task.updated') {
             currentTask.value = data.task
 
@@ -336,6 +364,10 @@ onMounted(async () => {
             nextTick(() => {
                 adjustTextareaHeight()
             })
+        }
+
+        if (data.type === 'task.deleted') {
+            emit('close')
         }
     })
 
@@ -362,7 +394,6 @@ const saveTaskDebounced = useDebounceFn(() => {
     })
 }, 1000)
 
-// TODO: add update field for dueDate
 // TODO: add delete task
 // TODO: add file attachment
 // TODO: add activity logs

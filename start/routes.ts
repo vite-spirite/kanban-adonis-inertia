@@ -76,6 +76,7 @@ router
         router.post('/projects/:id/tasks', [ProjectTaskController, 'create'])
         router.post('/projects/:id/tasks/:taskId/tags', [ProjectTaskController, 'updateTags'])
         router.put('/projects/:id/tasks/:taskId', [ProjectTaskController, 'update'])
+        router.delete('/projects/:id/tasks/:taskId', [ProjectTaskController, 'delete'])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())
