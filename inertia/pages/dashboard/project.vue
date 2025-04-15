@@ -7,6 +7,10 @@
         :task="pageProps.task as TaskDto"
         :tags="pageProps.project.tags || []"
         :allow-editable="can(pageProps.capabilities, Permissions.PROJECT_TASK_EDIT)"
+        :allow-deletable="can(pageProps.capabilities, Permissions.PROJECT_TASK_DELETE)"
+        :allow-list-create="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_CREATE)"
+        :allow-list-editable="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_EDIT)"
+        :allow-list-deletable="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_DELETE)"
     />
 
     <div class="flex flex-col w-full max-w-screen h-auto min-h-full">

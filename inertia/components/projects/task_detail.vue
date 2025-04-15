@@ -135,6 +135,15 @@
                                         >
                                         </textarea>
                                     </div>
+
+                                    <TaskList
+                                        v-for="list in currentTask.lists"
+                                        :list="list"
+                                        :project-id="currentTask.category?.projectId ?? 0"
+                                        :task-id="currentTask.id"
+                                        :allow-deletable="allowListDeletable"
+                                        :allow-editable="allowListEditable"
+                                    />
                                 </div>
 
                                 <div
@@ -184,7 +193,9 @@
                                         </button>
 
                                         <button
+                                            v-if="allowListCreate"
                                             class="text-sm font-medium p-2 text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
+                                            @click="createList"
                                         >
                                             <span class="text-gray-900">Add list</span>
                                         </button>
@@ -222,7 +233,7 @@
 import type { TaskDto } from '#types/task.dto'
 import type { TagDto } from '#types/tag.dto'
 
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { DateTime } from 'luxon'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import { Dialog, TransitionRoot, TransitionChild, DialogTitle, DialogPanel } from '@headlessui/vue'
@@ -231,6 +242,7 @@ import { ServerIcon, Bars3CenterLeftIcon, TagIcon, ClockIcon } from '@heroicons/
 import vuedraggable from 'vuedraggable'
 import Tag from '~/components/projects/tag.vue'
 import TagDraggable from '~/components/projects/tag_draggable.vue'
+import TaskList from '~/components/projects/task_list.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { Subscription } from '@adonisjs/transmit-client'
 import { transmit } from '~/utils/transmit'
@@ -240,12 +252,22 @@ const { task } = defineProps<{
     tags: TagDto[]
     allowEditable: boolean
     allowDeletable: boolean
+    allowListCreate: boolean
+    allowListEditable: boolean
+    allowListDeletable: boolean
 }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 const currentTask = ref<TaskDto>(task)
 const show = ref(true)
 const talkConfirmDelete = ref(false)
+
+watch(
+    () => task,
+    () => {
+        currentTask.value = task
+    }
+)
 
 const submitDelete = () => {
     router.delete(`/dashboard/projects/${task.category?.projectId}/tasks/${task.id}`, {
@@ -394,7 +416,23 @@ const saveTaskDebounced = useDebounceFn(() => {
     })
 }, 1000)
 
-// TODO: add delete task
+//TODO: add list
+
+const listCreateForm = useForm({
+    name: '',
+})
+
+const createList = () => {
+    listCreateForm.name = `list ${currentTask.value.lists.length + 1}`
+
+    listCreateForm.post(`/dashboard/projects/${task.category?.projectId}/tasks/${task.id}/lists`, {
+        preserveState: true,
+        onSuccess: () => {
+            listCreateForm.name = ''
+        },
+    })
+}
+
 // TODO: add file attachment
 // TODO: add activity logs
 </script>

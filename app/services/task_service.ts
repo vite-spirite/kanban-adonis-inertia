@@ -16,7 +16,7 @@ export class TaskService {
         return Task.query()
             .preload('tags', (s) => s.orderBy('order', 'asc'))
             .preload('category')
-            .preload('lists')
+            .preload('lists', (s) => s.orderBy('createdAt', 'asc'))
             .where('id', id)
             .first()
     }

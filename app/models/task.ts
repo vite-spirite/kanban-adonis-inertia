@@ -1,8 +1,9 @@
-import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
 import ProjectCategory from '#models/project_category'
 import ProjectTag from '#models/project_tag'
+import TaskList from '#models/task_list'
 
 export default class Task extends BaseModel {
     @column({ isPrimary: true })
@@ -30,6 +31,9 @@ export default class Task extends BaseModel {
         pivotColumns: ['order'],
     })
     declare tags: ManyToMany<typeof ProjectTag>
+
+    @hasMany(() => TaskList)
+    declare lists: HasMany<typeof TaskList>
 
     @column.dateTime()
     declare dueDate: DateTime | null

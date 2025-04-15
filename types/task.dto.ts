@@ -1,5 +1,6 @@
 import { TagDto } from '#types/tag.dto'
 import { CategoryDto } from '#types/category.dto'
+import { ListDto } from '#types/list.dto'
 
 export type TaskDto = {
     id: number
@@ -12,4 +13,5 @@ export type TaskDto = {
     updatedAt: string
     tags: TagDto[]
     category?: CategoryDto
+    lists: ListDto[]
 }

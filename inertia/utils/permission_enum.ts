@@ -20,4 +20,8 @@ export enum Permissions {
     PROJECT_TASK_DELETE = 'project:task:delete',
     PROJECT_TASK_EDIT = 'project:task:edit',
     PROJECT_TASK_ORDER = 'project:task:order',
+    PROJECT_TASK_LIST_CREATE = 'project:task:list:create',
+    PROJECT_TASK_LIST_DELETE = 'project:task:list:delete',
+    PROJECT_TASK_LIST_EDIT = 'project:task:list:edit',
+    PROJECT_TASK_LIST_CHECK = 'project:task:list:check',
 }

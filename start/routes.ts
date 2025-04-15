@@ -18,6 +18,7 @@ const ProjectController = () => import('#controllers/projects_controller')
 const ProjectCategoryController = () => import('#controllers/project_categories_controller')
 const ProjectTagController = () => import('#controllers/project_tags_controller')
 const ProjectTaskController = () => import('#controllers/tasks_controller')
+const ProjectTaskListController = () => import('#controllers/lists_controller')
 
 transmit.registerRoutes((route) => {
     route.use(middleware.auth())
@@ -77,6 +78,16 @@ router
         router.post('/projects/:id/tasks/:taskId/tags', [ProjectTaskController, 'updateTags'])
         router.put('/projects/:id/tasks/:taskId', [ProjectTaskController, 'update'])
         router.delete('/projects/:id/tasks/:taskId', [ProjectTaskController, 'delete'])
+
+        router.post(`/projects/:id/tasks/:taskId/lists`, [ProjectTaskListController, 'create'])
+        router.put(`/projects/:id/tasks/:taskId/lists/:listId`, [
+            ProjectTaskListController,
+            'update',
+        ])
+        router.delete(`/projects/:id/tasks/:taskId/lists/:listId`, [
+            ProjectTaskListController,
+            'delete',
+        ])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())
