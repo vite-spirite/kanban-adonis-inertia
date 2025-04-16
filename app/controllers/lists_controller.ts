@@ -6,9 +6,11 @@ import { ListService } from '#services/list_service'
 import { TaskService } from '#services/task_service'
 import { HttpContext } from '@adonisjs/core/http'
 import ListPolicy from '#policies/list_policy'
-import { ListCreateValidator } from '#validators/list'
+import { ListCreateValidator, ListLineCreateValidator } from '#validators/list'
 import transmit from '@adonisjs/transmit/services/main'
 import { TaskPresenter } from '#presenters/task_presenter'
+import TaskList from '#models/task_list'
+import { ListPresenter } from '#presenters/list_presenter'
 
 @inject()
 export default class ListsController {
@@ -115,6 +117,96 @@ export default class ListsController {
 
         await this.listService.delete(list)
 
+        this.submitTaskUpdate(list.taskId, project.id)
+
+        return response.redirect().back()
+    }
+
+    async createRow({ params, auth, request, bouncer, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(+params.id)
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ListPolicy).denies('update', project)) {
+            return response.redirect().back()
+        }
+
+        const list = await this.listService.findById(+params.listId)
+        if (!list || list.taskId !== +params.taskId) {
+            return response.redirect().back()
+        }
+
+        const payload = await ListLineCreateValidator.validate(request.all())
+        await this.listService.createRow(list, payload)
+
+        this.submitTaskUpdate(list.taskId, project.id)
+
+        return response.redirect().back()
+    }
+
+    async toggleRow({ params, auth, bouncer, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(+params.id)
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ListPolicy).denies('check', project)) {
+            return response.redirect().back()
+        }
+
+        const list = await this.listService.findById(+params.listId)
+
+        if (!list) {
+            return response.redirect().back()
+        }
+
+        const line = await this.listService.findLineById(list, +params.rowId)
+
+        if (!line) {
+            return response.redirect().back()
+        }
+
+        await this.listService.toggle(line, auth.user)
+
+        this.submitTaskUpdate(list.taskId, project.id)
+
+        return response.redirect().back()
+    }
+
+    async deleteRow({ params, auth, response, bouncer }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(+params.id)
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ListPolicy).denies('update', project)) {
+            return response.redirect().back()
+        }
+
+        const list = await this.listService.findById(+params.listId)
+        if (!list) {
+            return response.redirect().back()
+        }
+
+        const line = await this.listService.findLineById(list, +params.rowId)
+        if (!line) {
+            return response.redirect().back()
+        }
+
+        await this.listService.deleteRow(line)
         this.submitTaskUpdate(list.taskId, project.id)
 
         return response.redirect().back()

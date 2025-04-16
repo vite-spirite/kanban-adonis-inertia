@@ -11,6 +11,7 @@
         :allow-list-create="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_CREATE)"
         :allow-list-editable="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_EDIT)"
         :allow-list-deletable="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_DELETE)"
+        :allow-list-check="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_CHECK)"
     />
 
     <div class="flex flex-col w-full max-w-screen h-auto min-h-full">

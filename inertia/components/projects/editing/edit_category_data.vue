@@ -1,5 +1,5 @@
 <template>
-    <Menu as="div" class="relative inline-block text-left z-90">
+    <Menu as="div" class="relative inline-block text-left z-20">
         <TransitionRoot v-if="allowEdit" appear :show="openEditModal" as="template">
             <Dialog as="div" @close="openEditModal = false" class="relative">
                 <TransitionChild

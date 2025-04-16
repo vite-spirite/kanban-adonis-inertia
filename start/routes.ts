@@ -88,6 +88,21 @@ router
             ProjectTaskListController,
             'delete',
         ])
+
+        router.post(`/projects/:id/tasks/:taskId/lists/:listId/rows`, [
+            ProjectTaskListController,
+            'createRow',
+        ])
+
+        router.post(`/projects/:id/tasks/:taskId/lists/:listId/rows/:rowId/check`, [
+            ProjectTaskListController,
+            'toggleRow',
+        ])
+
+        router.delete(`/projects/:id/tasks/:taskId/lists/:listId/rows/:rowId`, [
+            ProjectTaskListController,
+            'deleteRow',
+        ])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())

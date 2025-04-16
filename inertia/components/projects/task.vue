@@ -27,9 +27,28 @@
             </p>
         </div>
 
-        <div v-if="task.dueDate" class="flex flex-row justify-start items-start space-x-2 mt-4">
-            <ClockIcon class="w-5 h-5 text-gray-500" />
-            <span class="text-sm font-medium text-gray-600">{{ formatDate }}</span>
+        <div class="flex flex-row justify-start items-center space-x-4 w-full mt-4">
+            <div
+                v-if="task.dueDate"
+                class="flex flex-row justify-start items-start space-x-2 px-2 py-1"
+            >
+                <ClockIcon class="w-5 h-5 text-gray-500" />
+                <span class="text-sm font-medium text-gray-600">{{ formatDate }}</span>
+            </div>
+
+            <div
+                v-if="task.totalLines && task.totalCompletedLines && task.totalLines > 0"
+                class="flex flex-row justify-start items-start space-x-2 text-gray-500 px-2 py-1"
+                :class="{
+                    '!text-green-900 bg-green-200 rounded-md':
+                        task.totalLines == task.totalCompletedLines,
+                }"
+            >
+                <DocumentCheckIcon class="w-5 h-5" />
+                <span class="text-sm font-medium"
+                    >{{ task.totalCompletedLines }}/{{ task.totalLines }}</span
+                >
+            </div>
         </div>
     </div>
 </template>
@@ -41,7 +60,7 @@ import type { TagDto } from '#types/tag.dto'
 import { DateTime } from 'luxon'
 import { computed, ref, watch } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
-import { ClockIcon } from '@heroicons/vue/24/outline'
+import { ClockIcon, DocumentCheckIcon } from '@heroicons/vue/24/outline'
 
 import Tag from '~/components/projects/tag.vue'
 import vuedraggable from 'vuedraggable'

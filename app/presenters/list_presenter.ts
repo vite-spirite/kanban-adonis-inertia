@@ -1,6 +1,7 @@
 import { TaskPresenter } from '#presenters/task_presenter'
 import TaskList from '#models/task_list'
 import type { ListDto } from '#types/list.dto'
+import { ListLinePresenter } from '#presenters/list_line_presenter'
 
 export class ListPresenter {
     declare id: number
@@ -8,6 +9,7 @@ export class ListPresenter {
     declare taskId: number
     declare createdAt: string
     declare task?: TaskPresenter
+    declare lines: ListLinePresenter[]
 
     constructor(list: TaskList) {
         this.id = list.id
@@ -15,8 +17,16 @@ export class ListPresenter {
         this.taskId = list.taskId
         this.createdAt = list.createdAt.toString()
 
+        this.lines = []
+
         if (list.task) {
             this.task = new TaskPresenter(list.task)
+        }
+
+        if (list.lines) {
+            this.lines = list.lines.map((line) => {
+                return new ListLinePresenter(line)
+            })
         }
     }
 
@@ -27,6 +37,7 @@ export class ListPresenter {
             taskId: this.taskId,
             task: this.task?.present(),
             createdAt: this.createdAt,
+            lines: this.lines.map((line) => line.present()),
         }
     }
 }

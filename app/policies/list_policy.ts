@@ -38,4 +38,11 @@ export default class ListPolicy extends BasePolicy {
             (perm) => perm.permission === Permissions.PROJECT_TASK_LIST_DELETE && perm.allow
         )
     }
+
+    async check(user: User, project: Project): Promise<AuthorizerResponse> {
+        const capabilities = await this.getUserCapabilities(user, project)
+        return !!capabilities.find(
+            (perm) => perm.permission === Permissions.PROJECT_TASK_LIST_CHECK && perm.allow
+        )
+    }
 }

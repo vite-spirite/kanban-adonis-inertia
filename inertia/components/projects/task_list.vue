@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col justify-items-start items-start w-full text-gray-600">
+    <div class="flex flex-col justify-items-start items-start w-full text-gray-600 space-y-4">
         <div class="flex flex-row justify-start items-center space-x-4 w-full">
             <ListBulletIcon class="size-4" />
 
@@ -17,6 +17,46 @@
                 <TrashIcon class="size-4" />
             </button>
         </div>
+
+        <div
+            v-for="line in list.lines"
+            class="flex flex-row justify-start items-center space-x-4 w-full pl-10"
+        >
+            <input
+                type="checkbox"
+                class="size-4"
+                :checked="line.completedAt !== null"
+                :disabled="!allowCheck"
+                @change="toggleRow(line.id)"
+            />
+            <span class="text-gray-500 inline-block flex-1">{{ line.name }}</span>
+
+            <button
+                class="text-gray-400 hover:text-red-500 transition duration-75 cursor-pointer transition disabled:hover:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
+                @click="deleteRow(line.id)"
+                :disabled="!allowDeletable"
+            >
+                <TrashIcon class="size-4" />
+            </button>
+        </div>
+
+        <form
+            class="flex flex-row justify-start items-center space-x-4 w-full pl-10"
+            @submit.prevent="submitNewLine"
+            v-if="allowEditable"
+        >
+            <input
+                type="text"
+                class="outline-transparent focus:outline-1 focus:outline-blue-500 font-medium text-lg flex-1 py-1 px-2 rounded-lg"
+                placeholder="New line..."
+                v-model="createNewLineForm.name"
+            />
+            <button
+                class="bg-green-100 text-green-900 hover:bg-green-300 cursor-pointer transition duration-75 px-2 py-1 rounded-md text-sm font-medium"
+            >
+                <span class="inline-block" @click="submitNewLine">Add</span>
+            </button>
+        </form>
     </div>
 </template>
 
@@ -33,12 +73,14 @@ const { list, projectId, taskId } = defineProps<{
     taskId: number
     allowDeletable: boolean
     allowEditable: boolean
+    allowCheck: boolean
 }>()
 
 watch(
     () => list,
     () => {
         updateListForm.name = list.name
+        createNewLineForm.order = list.lines.length
     }
 )
 
@@ -56,4 +98,33 @@ const deleteList = () => {
 const updateListDebounced = useDebounceFn(() => {
     updateListForm.put(`/dashboard/projects/${projectId}/tasks/${taskId}/lists/${list.id}`)
 }, 500)
+
+const createNewLineForm = useForm<{ name: string; order: number }>({
+    name: '',
+    order: list.lines.length,
+})
+
+const submitNewLine = () => {
+    createNewLineForm.post(
+        `/dashboard/projects/${projectId}/tasks/${taskId}/lists/${list.id}/rows`,
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                createNewLineForm.name = ''
+                createNewLineForm.order = list.lines.length
+            },
+        }
+    )
+}
+
+const toggleRow = (id: number) => {
+    router.post(
+        `/dashboard/projects/${projectId}/tasks/${taskId}/lists/${list.id}/rows/${id}/check`
+    )
+}
+
+const deleteRow = (id: number) => {
+    router.delete(`/dashboard/projects/${projectId}/tasks/${taskId}/lists/${list.id}/rows/${id}`)
+}
 </script>

@@ -14,4 +14,6 @@ export type TaskDto = {
     tags: TagDto[]
     category?: CategoryDto
     lists: ListDto[]
+    totalCompletedLines?: number
+    totalLines?: number
 }

@@ -2,7 +2,7 @@
     <Head :title="`${task.name}`" />
 
     <TransitionRoot appear :show="show" as="template">
-        <Dialog as="div" @close="emit('close')" class="relative z-10">
+        <Dialog as="div" @close="emit('close')" class="relative z-50">
             <TransitionChild
                 as="template"
                 enter="duration-300 ease-out"
@@ -143,6 +143,7 @@
                                         :task-id="currentTask.id"
                                         :allow-deletable="allowListDeletable"
                                         :allow-editable="allowListEditable"
+                                        :allow-check="allowListCheck"
                                     />
                                 </div>
 
@@ -255,6 +256,7 @@ const { task } = defineProps<{
     allowListCreate: boolean
     allowListEditable: boolean
     allowListDeletable: boolean
+    allowListCheck: boolean
 }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 

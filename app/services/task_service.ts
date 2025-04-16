@@ -8,6 +8,8 @@ export class TaskService {
     async findById(id: number): Promise<Task | null> {
         return Task.query()
             .preload('tags', (s) => s.orderBy('order', 'asc'))
+            .withCount('lines', (wc) => wc.as('linesCount'))
+            .withCount('lines', (wc) => wc.as('completedCount').whereNotNull('completedAt'))
             .where('id', id)
             .first()
     }
@@ -16,7 +18,13 @@ export class TaskService {
         return Task.query()
             .preload('tags', (s) => s.orderBy('order', 'asc'))
             .preload('category')
-            .preload('lists', (s) => s.orderBy('createdAt', 'asc'))
+            .preload('lists', (s) =>
+                s
+                    .orderBy('createdAt', 'asc')
+                    .preload('lines', (q) => q.orderBy('order', 'asc').preload('user'))
+            )
+            .withCount('lines', (wc) => wc.as('linesCount'))
+            .withCount('lines', (wc) => wc.as('completedCount').whereNotNull('completedAt'))
             .where('id', id)
             .first()
     }
@@ -90,8 +98,6 @@ export class TaskService {
         for (const tag of payload) {
             synchronizeArray[tag.id] = { order: tag.order }
         }
-
-        console.log(synchronizeArray)
 
         await task.related('tags').sync(synchronizeArray, true)
 

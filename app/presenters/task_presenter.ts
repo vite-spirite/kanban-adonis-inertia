@@ -18,6 +18,9 @@ export class TaskPresenter {
     declare category?: CategoryPresenter
     declare lists: ListPresenter[]
 
+    declare totalLines?: number
+    declare totalCompletedLines?: number
+
     constructor(task: Task) {
         this.id = task.id
         this.name = task.name
@@ -46,6 +49,14 @@ export class TaskPresenter {
                 return new ListPresenter(list)
             })
         }
+
+        if (task.$extras.completedCount) {
+            this.totalCompletedLines = task.$extras.completedCount
+        }
+
+        if (task.$extras.linesCount) {
+            this.totalLines = task.$extras.linesCount
+        }
     }
 
     present(): TaskDto {
@@ -61,6 +72,8 @@ export class TaskPresenter {
             tags: this.tags.map((tag) => tag.present()),
             category: this.category?.present(),
             lists: this.lists.map((l) => l.present()),
+            totalCompletedLines: this.totalCompletedLines,
+            totalLines: this.totalLines,
         }
     }
 }
