@@ -9,8 +9,21 @@ import encryption from '@adonisjs/core/services/encryption'
 import ProjectInvite from '#models/project_invite'
 import ProjectTag from '#models/project_tag'
 import ProjectTagPolicy from '#policies/project_tag_policy'
+import { MultipartFile } from '@adonisjs/core/bodyparser'
 
 export class ProjectService {
+    async create(payload: { name: string; image?: MultipartFile; public: boolean }) {
+        if (payload.image) {
+            const key = `projects/icons/${cuid()}.${payload.image.extname}`
+            await payload.image.moveToDisk(key)
+        }
+
+        return Project.create({
+            ...payload,
+            image: payload.image?.meta.url,
+        })
+    }
+
     /**
      * Get all projects
      */

@@ -25,6 +25,14 @@ export default class DashboardController {
         return inertia.render('dashboard/index')
     }
 
+    async createProject({ inertia, auth, response, params, bouncer }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().toRoute('login')
+        }
+
+        return inertia.render('dashboard/project/create')
+    }
+
     async project({ inertia, auth, response, params, bouncer }: HttpContext) {
         if (!auth.user) {
             return response.redirect().toRoute('login')

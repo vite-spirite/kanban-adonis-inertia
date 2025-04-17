@@ -37,6 +37,10 @@ router.get('/logout', [UserController, 'logout']).as('logout').use(middleware.au
 router
     .group(() => {
         router.get('/', [DashboardController, 'index']).as('dashboard.index')
+        router
+            .get('/projects/create', [DashboardController, 'createProject'])
+            .as('dashboard.create')
+        router.post('/projects/create', [ProjectController, 'create'])
 
         router.get('/projects/:id', [DashboardController, 'project']).as('dashboard.project')
 

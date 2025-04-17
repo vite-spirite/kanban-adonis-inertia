@@ -5,6 +5,17 @@ import RolePermission from '#models/role_permission'
 import { Permissions } from '#abilities/main'
 
 export class RoleService {
+    async createAdminRole(project: Project): Promise<Role> {
+        const role = new Role()
+        role.name = 'Administrator'
+        role.editable = false
+        await project.related('roles').save(role)
+
+        await this.createDefaultPermissions(role.id, true)
+
+        return role
+    }
+
     /**
      * Create a new role with default permissions
      * @param project The project to associate the role with
@@ -18,7 +29,7 @@ export class RoleService {
         await project.related('roles').save(role)
 
         // Create default permissions for the role
-        await this.createDefaultPermissions(role.id)
+        await this.createDefaultPermissions(role.id, false)
 
         return role
     }
@@ -28,12 +39,15 @@ export class RoleService {
      * @param roleId The role ID to create permissions for
      * @returns Array of created permission records
      */
-    private async createDefaultPermissions(roleId: number): Promise<RolePermission[]> {
+    private async createDefaultPermissions(
+        roleId: number,
+        allow: boolean = false
+    ): Promise<RolePermission[]> {
         return RolePermission.createMany(
             Object.values(Permissions).map((permission) => ({
                 roleId,
                 permission,
-                allow: false,
+                allow,
             }))
         )
     }

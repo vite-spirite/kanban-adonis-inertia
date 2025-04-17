@@ -2,7 +2,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import ProjectPolicy from '#policies/project_policy'
 import { inject } from '@adonisjs/core'
 import { ProjectService } from '#services/project_service'
-import { projectEdit } from '#validators/project'
+import { ProjectCreateValidator, projectEdit } from '#validators/project'
 import { RoleService } from '#services/role_service'
 import { CreateRoleValidator, UpdateRoleValidator, UpdateUserRoleValidator } from '#validators/role'
 import ProjectRolePolicy from '#policies/project_role_policy'
@@ -19,6 +19,25 @@ export default class ProjectsController {
         private readonly projectService: ProjectService,
         private readonly roleService: RoleService
     ) {}
+
+    async create({ request, auth, bouncer, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ProjectPolicy).denies('create')) {
+            return response.redirect().back()
+        }
+
+        const payload = await request.validateUsing(ProjectCreateValidator)
+
+        const project = await this.projectService.create(payload)
+        const adminRole = await this.roleService.createAdminRole(project)
+
+        await adminRole.related('users').attach([auth.user.id])
+
+        return response.redirect().toRoute('dashboard.project', { id: project.id })
+    }
 
     async update({ request, auth, bouncer, params, response }: HttpContext) {
         if (!auth.user) {
