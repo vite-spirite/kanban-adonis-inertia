@@ -3,6 +3,7 @@ import { TaskDto } from '#types/task.dto'
 import { TagPresenter } from '#presenters/tag_presenter'
 import { CategoryPresenter } from '#presenters/category_presenter'
 import { ListPresenter } from '#presenters/list_presenter'
+import { TaskAttachmentPresenter } from '#presenters/task_attachment_presenter'
 
 export class TaskPresenter {
     declare id: number
@@ -17,6 +18,7 @@ export class TaskPresenter {
     declare tags: TagPresenter[]
     declare category?: CategoryPresenter
     declare lists: ListPresenter[]
+    declare attachments: TaskAttachmentPresenter[]
 
     declare totalLines?: number
     declare totalCompletedLines?: number
@@ -33,6 +35,7 @@ export class TaskPresenter {
 
         this.tags = []
         this.lists = []
+        this.attachments = []
 
         if (task.tags && task.tags.length > 0) {
             this.tags = task.tags.map((tag) => {
@@ -47,6 +50,12 @@ export class TaskPresenter {
         if (task.lists && task.lists.length > 0) {
             this.lists = task.lists.map((list) => {
                 return new ListPresenter(list)
+            })
+        }
+
+        if (task.attachments && task.attachments.length > 0) {
+            this.attachments = task.attachments.map((attachment) => {
+                return new TaskAttachmentPresenter(attachment)
             })
         }
 
@@ -72,6 +81,7 @@ export class TaskPresenter {
             tags: this.tags.map((tag) => tag.present()),
             category: this.category?.present(),
             lists: this.lists.map((l) => l.present()),
+            attachments: this.attachments.map((a) => a.present()),
             totalCompletedLines: this.totalCompletedLines,
             totalLines: this.totalLines,
         }

@@ -12,6 +12,11 @@
         :allow-list-editable="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_EDIT)"
         :allow-list-deletable="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_DELETE)"
         :allow-list-check="can(pageProps.capabilities, Permissions.PROJECT_TASK_LIST_CHECK)"
+        :allow-file-create="can(pageProps.capabilities, Permissions.PROJECT_TASK_ATTACHMENT_CREATE)"
+        :allow-file-delete="can(pageProps.capabilities, Permissions.PROJECT_TASK_ATTACHMENT_DELETE)"
+        :allow-file-download="
+            can(pageProps.capabilities, Permissions.PROJECT_TASK_ATTACHMENT_DOWNLOAD)
+        "
     />
 
     <div class="flex flex-col w-full max-w-screen h-auto min-h-full">

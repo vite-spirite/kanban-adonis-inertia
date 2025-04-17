@@ -1,6 +1,7 @@
-import { TagDto } from '#types/tag.dto'
-import { CategoryDto } from '#types/category.dto'
-import { ListDto } from '#types/list.dto'
+import type { TagDto } from '#types/tag.dto'
+import type { CategoryDto } from '#types/category.dto'
+import type { ListDto } from '#types/list.dto'
+import type { AttachmentDto } from '#types/attachment.dto'
 
 export type TaskDto = {
     id: number
@@ -16,4 +17,5 @@ export type TaskDto = {
     lists: ListDto[]
     totalCompletedLines?: number
     totalLines?: number
+    attachments: AttachmentDto[]
 }

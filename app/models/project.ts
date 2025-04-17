@@ -1,10 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, hasMany, hasManyThrough } from '@adonisjs/lucid/orm'
+import type { HasMany, HasManyThrough } from '@adonisjs/lucid/types/relations'
 import ProjectRole from '#models/project_role'
 import ProjectInvite from '#models/project_invite'
 import ProjectCategory from '#models/project_category'
 import ProjectTag from '#models/project_tag'
+import Task from '#models/task'
 
 export default class Project extends BaseModel {
     @column({ isPrimary: true })
@@ -30,6 +31,13 @@ export default class Project extends BaseModel {
 
     @hasMany(() => ProjectTag, { localKey: 'id', foreignKey: 'projectId' })
     declare tags: HasMany<typeof ProjectTag>
+
+    @hasManyThrough([() => Task, () => ProjectCategory], {
+        localKey: 'id',
+        foreignKey: 'projectId',
+        throughForeignKey: 'categoryId',
+    })
+    declare tasks: HasManyThrough<typeof Task>
 
     @column.dateTime({ autoCreate: true })
     declare createdAt: DateTime

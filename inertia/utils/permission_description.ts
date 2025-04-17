@@ -103,4 +103,16 @@ export const PermissionDescription: Record<string, { title: string; description:
         title: 'Check task list',
         description: 'Check a task list',
     },
+    'project:task:attachment:create': {
+        title: 'Create task attachment',
+        description: 'Create a new task attachment',
+    },
+    'project:task:attachment:delete': {
+        title: 'Delete task attachment',
+        description: 'Delete a task attachment',
+    },
+    'project:task:attachment:download': {
+        title: 'Download task attachment',
+        description: 'Download a task attachment',
+    },
 }

@@ -46,4 +46,25 @@ export default class TaskPolicy extends BasePolicy {
             (perm) => perm.permission === Permissions.PROJECT_TASK_DELETE && perm.allow
         )
     }
+
+    async download(user: User, project: Project): Promise<AuthorizerResponse> {
+        const capabilities = await this.getUserCapabilities(user, project)
+        return !!capabilities.find(
+            (perm) => perm.permission === Permissions.PROJECT_TASK_ATTACHMENT_DOWNLOAD && perm.allow
+        )
+    }
+
+    async upload(user: User, project: Project): Promise<AuthorizerResponse> {
+        const capabilities = await this.getUserCapabilities(user, project)
+        return !!capabilities.find(
+            (perm) => perm.permission === Permissions.PROJECT_TASK_ATTACHMENT_CREATE && perm.allow
+        )
+    }
+
+    async deleteFile(user: User, project: Project): Promise<AuthorizerResponse> {
+        const capabilities = await this.getUserCapabilities(user, project)
+        return !!capabilities.find(
+            (perm) => perm.permission === Permissions.PROJECT_TASK_ATTACHMENT_DELETE && perm.allow
+        )
+    }
 }

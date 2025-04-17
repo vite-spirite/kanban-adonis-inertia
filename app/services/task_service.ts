@@ -25,6 +25,7 @@ export class TaskService {
             )
             .withCount('lines', (wc) => wc.as('linesCount'))
             .withCount('lines', (wc) => wc.as('completedCount').whereNotNull('completedAt'))
+            .preload('attachments', (q) => q.preload('uploader'))
             .where('id', id)
             .first()
     }

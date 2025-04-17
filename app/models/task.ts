@@ -17,6 +17,7 @@ import ProjectCategory from '#models/project_category'
 import ProjectTag from '#models/project_tag'
 import TaskList from '#models/task_list'
 import ListLine from '#models/list_line'
+import TaskAttachment from '#models/task_attachment'
 
 export default class Task extends BaseModel {
     @column({ isPrimary: true })
@@ -54,6 +55,12 @@ export default class Task extends BaseModel {
         throughForeignKey: 'listId',
     })
     declare lines: HasManyThrough<typeof ListLine>
+
+    @hasMany(() => TaskAttachment, {
+        localKey: 'id',
+        foreignKey: 'taskId',
+    })
+    declare attachments: HasMany<typeof TaskAttachment>
 
     @column.dateTime()
     declare dueDate: DateTime | null

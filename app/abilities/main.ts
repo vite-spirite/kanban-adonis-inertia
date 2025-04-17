@@ -40,6 +40,9 @@ export enum Permissions {
     PROJECT_TASK_LIST_DELETE = 'project:task:list:delete',
     PROJECT_TASK_LIST_EDIT = 'project:task:list:edit',
     PROJECT_TASK_LIST_CHECK = 'project:task:list:check',
+    PROJECT_TASK_ATTACHMENT_CREATE = 'project:task:attachment:create',
+    PROJECT_TASK_ATTACHMENT_DELETE = 'project:task:attachment:delete',
+    PROJECT_TASK_ATTACHMENT_DOWNLOAD = 'project:task:attachment:download',
 }
 
 /**

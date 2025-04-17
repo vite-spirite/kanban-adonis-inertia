@@ -19,6 +19,7 @@ const ProjectCategoryController = () => import('#controllers/project_categories_
 const ProjectTagController = () => import('#controllers/project_tags_controller')
 const ProjectTaskController = () => import('#controllers/tasks_controller')
 const ProjectTaskListController = () => import('#controllers/lists_controller')
+const ProjectTaskAttachmentController = () => import('#controllers/attachments_controller')
 
 transmit.registerRoutes((route) => {
     route.use(middleware.auth())
@@ -111,6 +112,23 @@ router
         router.put(`/projects/:id/tasks/:taskId/lists/:listId/rows/:rowId`, [
             ProjectTaskListController,
             'updateRow',
+        ])
+
+        router
+            .get('/projects/attachment/:attachmentId', [
+                ProjectTaskAttachmentController,
+                'download',
+            ])
+            .as('dashboard.download.attachment')
+
+        router.post('/projects/:id/tasks/:taskId/attachments', [
+            ProjectTaskAttachmentController,
+            'upload',
+        ])
+
+        router.delete('/projects/:id/tasks/:taskId/attachments/:attachmentId', [
+            ProjectTaskAttachmentController,
+            'delete',
         ])
     })
     .prefix('/dashboard')

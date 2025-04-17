@@ -16,6 +16,12 @@ const driveConfig = defineConfig({
             routeBasePath: '/uploads',
             visibility: 'public',
         }),
+        attachments: services.fs({
+            location: app.makePath('attachments'),
+            serveFiles: false,
+            visibility: 'private',
+            routeBasePath: '/attachments',
+        }),
     },
 })
 

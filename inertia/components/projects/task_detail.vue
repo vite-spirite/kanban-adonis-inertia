@@ -146,6 +146,57 @@
                                         :allow-editable="allowListEditable"
                                         :allow-check="allowListCheck"
                                     />
+
+                                    <div
+                                        class="flex flex-col justify-start items-start space-y-2 w-full"
+                                    >
+                                        <div
+                                            class="flex flex-row justify-start items-center space-x-2 text-gray-600 w-full"
+                                        >
+                                            <PaperClipIcon class="h-6 w-6" />
+                                            <h4 class="m-0 p-0 font-semibold text-lg">
+                                                Attachments
+                                            </h4>
+                                        </div>
+                                        <div class="w-full pl-8 flex flex-col space-y-2">
+                                            <Attachment
+                                                v-for="attachment in currentTask.attachments"
+                                                :attachment="attachment"
+                                                :allow-delete="allowFileDelete"
+                                                :allow-download="allowFileDownload"
+                                                :project-id="task.category?.projectId ?? 0"
+                                                :task-id="task.id"
+                                            />
+                                        </div>
+
+                                        <form
+                                            class="flex flex-row justify-start items-center space-x-2 w-full pl-8"
+                                            @submit.prevent="uploadAttachment"
+                                            v-if="allowFileCreate"
+                                        >
+                                            <input
+                                                type="file"
+                                                class="outline-transparent focus:outline-1 focus:outline-blue-500 font-medium text-sm flex-1 py-1 px-2 rounded-lg"
+                                                @change="
+                                                    (e) =>
+                                                        (attachmentForm.file = (
+                                                            e.target as any
+                                                        ).files[0])
+                                                "
+                                                :disabled="!allowEditable"
+                                            />
+                                            <button
+                                                class="bg-green-100 text-green-900 hover:bg-green-300 cursor-pointer transition duration-75 px-2 py-1 rounded-md text-sm font-medium"
+                                                :disabled="!allowEditable"
+                                            >
+                                                <span
+                                                    class="inline-block w-full h-full"
+                                                    @click="uploadAttachment"
+                                                    >Upload</span
+                                                >
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
 
                                 <div
@@ -241,12 +292,19 @@ import { nextTick, onMounted, ref, watch } from 'vue'
 import { DateTime } from 'luxon'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import { Dialog, TransitionRoot, TransitionChild, DialogTitle, DialogPanel } from '@headlessui/vue'
-import { ServerIcon, Bars3CenterLeftIcon, TagIcon, ClockIcon } from '@heroicons/vue/24/outline'
+import {
+    ServerIcon,
+    Bars3CenterLeftIcon,
+    TagIcon,
+    ClockIcon,
+    PaperClipIcon,
+} from '@heroicons/vue/24/outline'
 
 import vuedraggable from 'vuedraggable'
 import Tag from '~/components/projects/tag.vue'
 import TagDraggable from '~/components/projects/tag_draggable.vue'
 import TaskList from '~/components/projects/task_list.vue'
+import Attachment from '~/components/projects/attachment.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { Subscription } from '@adonisjs/transmit-client'
 import { transmit } from '~/utils/transmit'
@@ -260,6 +318,9 @@ const { task } = defineProps<{
     allowListEditable: boolean
     allowListDeletable: boolean
     allowListCheck: boolean
+    allowFileDelete: boolean
+    allowFileDownload: boolean
+    allowFileCreate: boolean
 }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
@@ -436,6 +497,20 @@ const createList = () => {
             listCreateForm.name = ''
         },
     })
+}
+
+const attachmentForm = useForm({
+    file: '',
+})
+
+const uploadAttachment = () => {
+    attachmentForm.post(
+        `/dashboard/projects/${task.category?.projectId}/tasks/${task.id}/attachments`,
+        {
+            preserveState: true,
+            forceFormData: true,
+        }
+    )
 }
 
 // TODO: add file attachment
