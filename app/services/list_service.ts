@@ -44,4 +44,8 @@ export class ListService {
     async deleteRow(line: ListLine) {
         return line.delete()
     }
+
+    async updateLine(line: ListLine, payload: { name: string }) {
+        return line.merge(payload).save()
+    }
 }

@@ -124,16 +124,17 @@
                                                 Description
                                             </h4>
                                         </div>
-
-                                        <textarea
-                                            ref="descriptionTextareaReference"
-                                            v-model="taskForm.description"
-                                            class="text-sm text-gray-500 font-normal ml-8 w-full resize-y focus:outline-blue-500 transition h-full"
-                                            :disabled="!allowEditable"
-                                            @change="saveTaskDebounced"
-                                            @input="adjustTextareaHeight"
-                                        >
-                                        </textarea>
+                                        <div class="w-full pl-8">
+                                            <textarea
+                                                ref="descriptionTextareaReference"
+                                                v-model="taskForm.description"
+                                                class="text-sm text-gray-500 font-normal w-full resize-y focus:outline-blue-500 transition h-full"
+                                                :disabled="!allowEditable"
+                                                @change="saveTaskDebounced"
+                                                @input="adjustTextareaHeight"
+                                            >
+                                            </textarea>
+                                        </div>
                                     </div>
 
                                     <TaskList
@@ -149,6 +150,7 @@
 
                                 <div
                                     class="flex flex-col justify-start items-start w-1/3 bg-gray-200 p-4"
+                                    v-if="allowEditable"
                                 >
                                     <div
                                         class="flex flex-col justify-start items-start space-y-2 w-full"
@@ -177,6 +179,7 @@
                                         </div>
 
                                         <button
+                                            v-if="allowEditable"
                                             class="text-sm font-medium text-gray-900 bg-gray-300/50 rounded-md hover:bg-gray-400/25 transition w-full inline-block text-center cursor-pointer"
                                         >
                                             <span

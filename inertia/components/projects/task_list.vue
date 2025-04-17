@@ -18,28 +18,17 @@
             </button>
         </div>
 
-        <div
-            v-for="line in list.lines"
-            class="flex flex-row justify-start items-center space-x-4 w-full pl-10"
-        >
-            <input
-                type="checkbox"
-                class="size-4"
-                :checked="line.completedAt !== null"
-                :disabled="!allowCheck"
-                @change="toggleRow(line.id)"
+        <div v-for="line in list.lines" class="w-full pl-10">
+            <ProjectTaskLine
+                :line="line"
+                :projectId="projectId"
+                :taskId="taskId"
+                :listId="list.id"
+                :allowEditable="allowEditable"
+                :allowDeletable="allowDeletable"
+                :allowCheck="allowCheck"
             />
-            <span class="text-gray-500 inline-block flex-1">{{ line.name }}</span>
-
-            <button
-                class="text-gray-400 hover:text-red-500 transition duration-75 cursor-pointer transition disabled:hover:text-gray-400 disabled:cursor-not-allowed disabled:opacity-50"
-                @click="deleteRow(line.id)"
-                :disabled="!allowDeletable"
-            >
-                <TrashIcon class="size-4" />
-            </button>
         </div>
-
         <form
             class="flex flex-row justify-start items-center space-x-4 w-full pl-10"
             @submit.prevent="submitNewLine"
@@ -66,6 +55,8 @@ import type { ListDto } from '#types/list.dto'
 import { router, useForm } from '@inertiajs/vue3'
 import { useDebounceFn } from '@vueuse/core'
 import { watch } from 'vue'
+
+import ProjectTaskLine from '~/components/projects/list_row.vue'
 
 const { list, projectId, taskId } = defineProps<{
     list: ListDto
@@ -116,15 +107,5 @@ const submitNewLine = () => {
             },
         }
     )
-}
-
-const toggleRow = (id: number) => {
-    router.post(
-        `/dashboard/projects/${projectId}/tasks/${taskId}/lists/${list.id}/rows/${id}/check`
-    )
-}
-
-const deleteRow = (id: number) => {
-    router.delete(`/dashboard/projects/${projectId}/tasks/${taskId}/lists/${list.id}/rows/${id}`)
 }
 </script>

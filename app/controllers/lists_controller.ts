@@ -6,7 +6,11 @@ import { ListService } from '#services/list_service'
 import { TaskService } from '#services/task_service'
 import { HttpContext } from '@adonisjs/core/http'
 import ListPolicy from '#policies/list_policy'
-import { ListCreateValidator, ListLineCreateValidator } from '#validators/list'
+import {
+    ListCreateValidator,
+    ListLineCreateValidator,
+    ListLineUpdateValidator,
+} from '#validators/list'
 import transmit from '@adonisjs/transmit/services/main'
 import { TaskPresenter } from '#presenters/task_presenter'
 import TaskList from '#models/task_list'
@@ -209,6 +213,37 @@ export default class ListsController {
         await this.listService.deleteRow(line)
         this.submitTaskUpdate(list.taskId, project.id)
 
+        return response.redirect().back()
+    }
+
+    async updateRow({ params, auth, request, bouncer, response }: HttpContext) {
+        if (!auth.user) {
+            return response.redirect().back()
+        }
+
+        const project = await this.projectService.findById(+params.id)
+        if (!project) {
+            return response.redirect().back()
+        }
+
+        if (await bouncer.with(ListPolicy).denies('update', project)) {
+            return response.redirect().back()
+        }
+
+        const list = await this.listService.findById(+params.listId)
+        if (!list) {
+            return response.redirect().back()
+        }
+
+        const line = await this.listService.findLineById(list, +params.rowId)
+        if (!line) {
+            return response.redirect().back()
+        }
+
+        const payload = await ListLineUpdateValidator.validate(request.all())
+
+        await this.listService.updateLine(line, payload)
+        this.submitTaskUpdate(list.taskId, project.id)
         return response.redirect().back()
     }
 }

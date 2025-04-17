@@ -12,3 +12,9 @@ export const ListLineCreateValidator = vine.compile(
         order: vine.number().positive(),
     })
 )
+
+export const ListLineUpdateValidator = vine.compile(
+    vine.object({
+        name: vine.string().minLength(1).maxLength(255),
+    })
+)

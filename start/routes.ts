@@ -107,6 +107,11 @@ router
             ProjectTaskListController,
             'deleteRow',
         ])
+
+        router.put(`/projects/:id/tasks/:taskId/lists/:listId/rows/:rowId`, [
+            ProjectTaskListController,
+            'updateRow',
+        ])
     })
     .prefix('/dashboard')
     .middleware(middleware.auth())
