@@ -24,9 +24,15 @@ export default class TasksController {
     ) {}
 
     private submitUpdateSSE(task: Task, project: Project) {
-        transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}/tasks`, {
-            type: 'task.updated',
-            task: new TaskPresenter(task).present(),
+        this.taskService.findById(task.id).then((t) => {
+            if (!t) {
+                return
+            }
+
+            transmit.broadcast(`/projects/${project.id}/category/${t.categoryId}/tasks`, {
+                type: 'task.updated',
+                task: new TaskPresenter(t).present(),
+            })
         })
 
         this.taskService.findByIdWithDetails(task.id).then((taskDetail) => {
@@ -87,7 +93,7 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}`, {
+        transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}/tasks`, {
             type: 'task.created',
             task: new TaskPresenter(task).present(),
         })
@@ -105,7 +111,13 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        const task = await this.taskService.findById(+params.taskId)
+        // Méthode sécurisée: récupérer la tâche à travers la relation avec le projet
+        const task = await project
+            .related('tasks')
+            .query()
+            .where('tasks.id', +params.taskId)
+            .first()
+
         if (!task) {
             return response.redirect().back()
         }
@@ -114,7 +126,6 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        console.log(request.all())
         const payload = await TaskTagEditingValidator.validate(request.all())
 
         const taskUpdated = await this.taskService.updateTags(task, payload.tags)
@@ -138,7 +149,13 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        const task = await this.taskService.findById(+params.taskId)
+        // Méthode sécurisée: récupérer la tâche à travers la relation avec le projet
+        const task = await project
+            .related('tasks')
+            .query()
+            .where('tasks.id', +params.taskId)
+            .first()
+
         if (!task) {
             return response.redirect().back()
         }
@@ -170,7 +187,13 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        const task = await this.taskService.findById(+params.taskId)
+        // Méthode sécurisée: récupérer la tâche à travers la relation avec le projet
+        const task = await project
+            .related('tasks')
+            .query()
+            .where('tasks.id', +params.taskId)
+            .first()
+
         if (!task) {
             return response.redirect().back()
         }

@@ -3,10 +3,10 @@
         class="min-w-md max-w-md w-full flex flex-col justify-start items-start hover:bg-gray-50 transition group h-auto min-h-full"
     >
         <ProjectCreateTask
-            :category-id="category.id"
-            :order="category.tasks.length ?? 0"
+            :category-id="currentCategory.id"
+            :order="currentCategory.tasks.length ?? 0"
             :open="createTaskDialog"
-            :project-id="category.projectId"
+            :project-id="currentCategory.projectId"
             @close="createTaskDialog = false"
         />
 
@@ -15,15 +15,15 @@
         >
             <div
                 class="rounded-full size-4 mr-2"
-                :style="{ 'background-color': category.color }"
+                :style="{ 'background-color': currentCategory.color }"
             ></div>
 
             <h2 class="text-xl font-semibold text-gray-800 flex-1">
-                {{ category.name }}
+                {{ currentCategory.name }}
             </h2>
 
             <ProjectCategoryEdit
-                :category="category"
+                :category="currentCategory"
                 :allow-delete="allowDeleting"
                 :allow-edit="allowEditing"
                 v-if="allowDeleting || allowEditing"
@@ -31,7 +31,7 @@
         </div>
 
         <draggable
-            v-model="category.tasks"
+            v-model="currentCategory.tasks"
             item-key="id"
             group="tasks"
             @change="onTaskChange"
@@ -42,7 +42,7 @@
                 <div class="w-full">
                     <ProjectTaskCard
                         :task="task as TaskDto"
-                        :project-id="category.projectId"
+                        :project-id="currentCategory.projectId"
                         :editable="allowEditingTask"
                     />
                 </div>
@@ -65,7 +65,7 @@
 import type { CategoryDto } from '#types/category.dto'
 import type { TaskDto } from '#types/task.dto'
 
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { PlusCircleIcon } from '@heroicons/vue/24/outline'
 import ProjectTaskCard from '~/components/projects/task.vue'
@@ -86,6 +86,14 @@ const { category } = defineProps<{
     allowDeletingTask: boolean
 }>()
 
+const currentCategory = ref<CategoryDto>(category)
+watch(
+    () => category,
+    () => {
+        currentCategory.value = category
+    }
+)
+
 const emit = defineEmits<{
     (e: 'taskChanged', category: CategoryDto, event): void
 }>()
@@ -100,25 +108,36 @@ let subscription: null | Subscription = null
 
 onMounted(async () => {
     subscription = transmit.instance.subscription(
-        `/projects/${category.projectId}/category/${category.id}/tasks`
+        `/projects/${currentCategory.value.projectId}/category/${currentCategory.value.id}/tasks`
     )
     await subscription.create()
 
-    subscription.onMessage((data: { type: 'task.updated' | 'task.deleted'; task: TaskDto }) => {
-        if (data.type === 'task.updated') {
-            const taskIdx = category.tasks.findIndex((task) => task.id === data.task.id)
-            if (taskIdx !== -1) {
-                category.tasks[taskIdx] = data.task
+    subscription.onMessage(
+        (data: { type: 'task.updated' | 'task.deleted' | 'task.created'; task: TaskDto }) => {
+            if (data.type === 'task.updated') {
+                const taskIdx = currentCategory.value.tasks.findIndex(
+                    (task) => task.id === data.task.id
+                )
+                if (taskIdx !== -1) {
+                    currentCategory.value.tasks[taskIdx] = data.task
+                }
             }
-        }
 
-        if (data.type === 'task.deleted') {
-            const taskIdx = category.tasks.findIndex((task) => task.id === data.task.id)
-            if (taskIdx !== -1) {
-                category.tasks.splice(taskIdx, 1)
+            if (data.type === 'task.deleted') {
+                const taskIdx = currentCategory.value.tasks.findIndex(
+                    (task) => task.id === data.task.id
+                )
+                if (taskIdx !== -1) {
+                    currentCategory.value.tasks.splice(taskIdx, 1)
+                }
+            }
+
+            if (data.type === 'task.created') {
+                currentCategory.value.tasks.push(data.task)
+                currentCategory.value.tasks.sort((a, b) => a.order - b.order)
             }
         }
-    })
+    )
 })
 
 onUnmounted(async () => {
