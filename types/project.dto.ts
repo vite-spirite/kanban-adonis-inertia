@@ -12,6 +12,7 @@ export type ProjectDto = {
     id: number
     name: string
     image?: string
+    public: boolean
     createdAt: string
     updatedAt: string
     roles?: RoleDto[]
@@ -24,4 +25,5 @@ export type ProjectDto = {
 export type ProjectEditDto = {
     name: string
     image?: MultipartFile
+    public?: boolean
 }

@@ -35,7 +35,7 @@
             </div>
 
             <h2
-                v-if="pageProps.project.invites.length > 0"
+                v-if="pageProps.project.invites && pageProps.project.invites.length > 0"
                 class="text-2xl font-semibold text-gray-800"
             >
                 Invites

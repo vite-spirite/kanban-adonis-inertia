@@ -9,5 +9,6 @@ export const projectEdit = vine.compile(
                 extnames: ['jpg', 'jpeg', 'png'],
             })
             .optional(),
+        public: vine.boolean().optional(),
     })
 )

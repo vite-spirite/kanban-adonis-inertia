@@ -16,6 +16,9 @@ export default class Project extends BaseModel {
     @column()
     declare image?: string
 
+    @column()
+    declare public: boolean
+
     @hasMany(() => ProjectRole)
     declare roles: HasMany<typeof ProjectRole>
 

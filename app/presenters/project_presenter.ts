@@ -10,6 +10,7 @@ export class ProjectPresenter {
     declare id: number
     declare name: string
     declare image?: string
+    declare public: boolean
     declare createdAt: string
     declare updatedAt: string
 
@@ -23,6 +24,7 @@ export class ProjectPresenter {
         this.id = project.id
         this.name = project.name
         this.image = project.image
+        this.public = project.public
         this.createdAt = project.createdAt.toISO() || ''
         this.updatedAt = project.updatedAt.toISO() || ''
 
@@ -75,6 +77,7 @@ export class ProjectPresenter {
             id: this.id,
             name: this.name,
             image: this.image,
+            public: this.public,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             roles: this.roles?.map((role) => role.present()),

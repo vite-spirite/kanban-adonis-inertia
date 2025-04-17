@@ -18,6 +18,10 @@ export default class ProjectPolicy extends BasePolicy {
     }
 
     async read(user: User, project: Project): Promise<AuthorizerResponse> {
+        if (project.public) {
+            return true
+        }
+
         const permissions = await this.projectService.findPermissionByUser(user, project)
 
         return !!permissions.find(
