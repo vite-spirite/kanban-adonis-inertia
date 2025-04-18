@@ -13,12 +13,14 @@ import Project from '#models/project'
 import transmit from '@adonisjs/transmit/services/main'
 import { TaskPresenter } from '#presenters/task_presenter'
 import { TaskService } from '#services/task_service'
+import { ActivityService } from '#services/activity_service'
 
 @inject()
 export default class AttachmentsController {
     constructor(
         private readonly projectService: ProjectService,
-        private readonly taskService: TaskService
+        private readonly taskService: TaskService,
+        private readonly activityService: ActivityService
     ) {}
 
     private submitUpdateSSE(task: Task, project: Project) {
@@ -94,11 +96,23 @@ export default class AttachmentsController {
         const key = `${cuid()}.${payload.file.extname}`
         await payload.file.moveToDisk(key, 'attachments')
 
-        await TaskAttachment.create({
+        const attachment = await TaskAttachment.create({
             name: payload.file.clientName,
             path: payload.file.filePath,
             taskId: task.id,
             uploadedBy: auth.user.id,
+        })
+
+        await this.activityService.createActivity({
+            projectId: project.id,
+            actorId: auth.user.id,
+            subjectType: 'attachment',
+            subjectId: attachment.id,
+            type: 'attachment_created',
+            meta: {
+                name: attachment.name,
+                task_id: task.id,
+            },
         })
 
         this.submitUpdateSSE(task, project)
@@ -147,6 +161,18 @@ export default class AttachmentsController {
         if (await disk.exists(attachment.path)) {
             await disk.delete(attachment.path)
         }
+
+        await this.activityService.createActivity({
+            projectId: project.id,
+            actorId: auth.user.id,
+            subjectType: 'attachment',
+            subjectId: attachment.id,
+            type: 'attachment_deleted',
+            meta: {
+                name: attachment.name,
+                task_id: task.id,
+            },
+        })
 
         this.submitUpdateSSE(task, project)
 

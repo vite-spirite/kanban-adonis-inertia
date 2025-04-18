@@ -17,6 +17,7 @@
         :allow-file-download="
             can(pageProps.capabilities, Permissions.PROJECT_TASK_ATTACHMENT_DOWNLOAD)
         "
+        :activities="pageProps.activities"
     />
 
     <div class="flex flex-col w-full max-w-screen h-auto min-h-full">

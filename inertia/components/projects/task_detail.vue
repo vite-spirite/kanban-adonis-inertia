@@ -197,6 +197,16 @@
                                             </button>
                                         </form>
                                     </div>
+
+                                    <div
+                                        class="flex flex-col justify-start items-center w-full divide-y divide-gray-100"
+                                    >
+                                        <Activity
+                                            class="py-2"
+                                            v-for="activity in activities"
+                                            :activity="activity"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div
@@ -290,7 +300,7 @@ import type { TagDto } from '#types/tag.dto'
 
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { DateTime } from 'luxon'
-import { Head, router, useForm } from '@inertiajs/vue3'
+import { Deferred, Head, router, useForm } from '@inertiajs/vue3'
 import { Dialog, TransitionRoot, TransitionChild, DialogTitle, DialogPanel } from '@headlessui/vue'
 import {
     ServerIcon,
@@ -308,6 +318,8 @@ import Attachment from '~/components/projects/attachment.vue'
 import { useDebounceFn } from '@vueuse/core'
 import { Subscription } from '@adonisjs/transmit-client'
 import { transmit } from '~/utils/transmit'
+import type { ActivityDto } from '#types/activity.dto'
+import Activity from '~/components/projects/activity.vue'
 
 const { task } = defineProps<{
     task: TaskDto
@@ -321,6 +333,7 @@ const { task } = defineProps<{
     allowFileDelete: boolean
     allowFileDownload: boolean
     allowFileCreate: boolean
+    activities?: ActivityDto[]
 }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 

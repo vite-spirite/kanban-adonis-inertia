@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import { TaskService } from '#services/task_service'
 import { ProjectService } from '#services/project_service'
+import { ActivityService } from '#services/activity_service'
 import {
     TaskCreateValidator,
     TaskReorderValidator,
@@ -20,7 +21,8 @@ import Project from '#models/project'
 export default class TasksController {
     constructor(
         private readonly projectService: ProjectService,
-        private readonly taskService: TaskService
+        private readonly taskService: TaskService,
+        private readonly activityService: ActivityService
     ) {}
 
     private submitUpdateSSE(task: Task, project: Project) {
@@ -61,7 +63,7 @@ export default class TasksController {
         }
 
         const payload = await TaskReorderValidator.validate(request.all())
-        const categoriesTasks = await this.taskService.reorder(project, payload.tasks)
+        const categoriesTasks = await this.taskService.reorder(project, payload.tasks, auth.user.id)
 
         transmit.broadcast(`/projects/${project.id}/categories`, {
             type: 'category.reorder',
@@ -93,6 +95,20 @@ export default class TasksController {
             return response.redirect().back()
         }
 
+        await task.load('category')
+
+        await this.activityService.createActivity({
+            projectId: project.id,
+            actorId: auth.user.id,
+            subjectType: 'task',
+            subjectId: task.id,
+            type: 'task_created',
+            meta: {
+                name: task.name,
+                category: task.category.name,
+            },
+        })
+
         transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}/tasks`, {
             type: 'task.created',
             task: new TaskPresenter(task).present(),
@@ -111,10 +127,10 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        // Méthode sécurisée: récupérer la tâche à travers la relation avec le projet
         const task = await project
             .related('tasks')
             .query()
+            .preload('tags')
             .where('tasks.id', +params.taskId)
             .first()
 
@@ -128,11 +144,43 @@ export default class TasksController {
 
         const payload = await TaskTagEditingValidator.validate(request.all())
 
+        const afterTags = task.tags.map((t) => t.serialize())
+
         const taskUpdated = await this.taskService.updateTags(task, payload.tags)
 
         if (!taskUpdated) {
             return response.redirect().back()
         }
+
+        const beforeTags = taskUpdated.tags.map((t) => t.serialize())
+
+        const addedTags = beforeTags.filter((tag) => !afterTags.some((t) => t.id === tag.id))
+        const removedTags = afterTags.filter((tag) => !beforeTags.some((t) => t.id === tag.id))
+
+        await this.activityService.createMany([
+            ...addedTags.map((tag) => ({
+                projectId: project.id,
+                actorId: auth.user.id,
+                subjectType: 'task',
+                subjectId: taskUpdated.id,
+                type: 'task_tag_added',
+                meta: {
+                    name: tag.name,
+                    color: tag.color,
+                },
+            })),
+            ...removedTags.map((tag) => ({
+                projectId: project.id,
+                actorId: auth.user.id,
+                subjectType: 'task',
+                subjectId: taskUpdated.id,
+                type: 'task_tag_removed',
+                meta: {
+                    name: tag.name,
+                    color: tag.color,
+                },
+            })),
+        ])
 
         this.submitUpdateSSE(taskUpdated, project)
 
@@ -149,7 +197,6 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        // Méthode sécurisée: récupérer la tâche à travers la relation avec le projet
         const task = await project
             .related('tasks')
             .query()
@@ -166,10 +213,33 @@ export default class TasksController {
 
         const payload = await TaskUpdateValidator.validate(request.all())
 
+        const baseTask = task.serialize()
         const taskUpdated = await this.taskService.update(task, payload)
 
         if (!taskUpdated) {
             return response.redirect().back()
+        }
+
+        if (
+            baseTask.name !== taskUpdated.name ||
+            baseTask.description !== taskUpdated.description ||
+            baseTask.dueDate !== taskUpdated.dueDate
+        ) {
+            await this.activityService.createActivity({
+                projectId: project.id,
+                actorId: auth.user.id,
+                subjectType: 'task',
+                subjectId: taskUpdated.id,
+                type: 'task_updated',
+                meta: {
+                    fromName: baseTask.name,
+                    fromDescription: baseTask.description,
+                    fromDueDate: baseTask.dueDate,
+                    toName: taskUpdated.name,
+                    toDescription: taskUpdated.description,
+                    toDueDate: taskUpdated.dueDate,
+                },
+            })
         }
 
         this.submitUpdateSSE(taskUpdated, project)
@@ -187,7 +257,6 @@ export default class TasksController {
             return response.redirect().back()
         }
 
-        // Méthode sécurisée: récupérer la tâche à travers la relation avec le projet
         const task = await project
             .related('tasks')
             .query()
@@ -203,6 +272,17 @@ export default class TasksController {
         }
 
         await this.taskService.delete(task)
+
+        await this.activityService.createActivity({
+            projectId: project.id,
+            actorId: auth.user.id,
+            subjectType: 'task',
+            subjectId: task.id,
+            type: 'task_deleted',
+            meta: {
+                name: task.name,
+            },
+        })
 
         transmit.broadcast(`/projects/${project.id}/category/${task.categoryId}/tasks`, {
             type: 'task.deleted',

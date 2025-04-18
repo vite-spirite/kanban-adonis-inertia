@@ -8,12 +8,15 @@ import ProjectPolicy from '#policies/project_policy'
 import { ProjectDto } from '#types/project.dto'
 import { TaskService } from '#services/task_service'
 import { TaskPresenter } from '#presenters/task_presenter'
+import { ActivityService } from '#services/activity_service'
+import { ActivityPresenter } from '#presenters/activity_presenter'
 
 @inject()
 export default class DashboardController {
     constructor(
         private readonly projectService: ProjectService,
-        private readonly taskService: TaskService
+        private readonly taskService: TaskService,
+        private readonly activityService: ActivityService
     ) {}
 
     async index({ inertia, auth, response }: HttpContext) {
@@ -157,6 +160,12 @@ export default class DashboardController {
             project: presenter.present(),
             capabilities: capabilitiesPresenter,
             task: new TaskPresenter(task).present(),
+            activities: inertia.defer(async () => {
+                const activities = await this.activityService.findByTaskId(task.id)
+                return activities.map((activity) => {
+                    return new ActivityPresenter(activity).present()
+                })
+            }),
         })
     }
 }

@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import Project from '#models/project'
 import Task from '#models/task'
 import ProjectCategory from '#models/project_category'
+import Activity from '#models/activity'
 
 export class TaskService {
     async findById(id: number): Promise<Task | null> {
@@ -30,7 +31,11 @@ export class TaskService {
             .first()
     }
 
-    async reorder(project: Project, payload: { id: number; categoryId: number; order: number }[]) {
+    async reorder(
+        project: Project,
+        payload: { id: number; categoryId: number; order: number }[],
+        userId: number
+    ) {
         return await db.transaction(async (trx) => {
             const categories =
                 project.categories ??
@@ -51,6 +56,24 @@ export class TaskService {
                 }
 
                 if (categoryIds.includes(task.categoryId)) {
+                    if (taskToUpdate.categoryId !== task.categoryId) {
+                        await Activity.create(
+                            {
+                                projectId: project.id,
+                                actorId: userId,
+                                subjectType: 'task',
+                                subjectId: task.id,
+                                type: 'task_moved',
+                                meta: {
+                                    from: categories.find((c) => c.id === taskToUpdate.categoryId)
+                                        ?.name,
+                                    to: categories.find((c) => c.id === task.categoryId)?.name,
+                                },
+                            },
+                            { client: trx }
+                        )
+                    }
+
                     await Task.query({ client: trx })
                         .update({ order: task.order, categoryId: task.categoryId })
                         .where('id', task.id)

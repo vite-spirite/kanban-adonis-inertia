@@ -13,15 +13,15 @@ import {
 } from '#validators/list'
 import transmit from '@adonisjs/transmit/services/main'
 import { TaskPresenter } from '#presenters/task_presenter'
-import TaskList from '#models/task_list'
-import { ListPresenter } from '#presenters/list_presenter'
+import { ActivityService } from '#services/activity_service'
 
 @inject()
 export default class ListsController {
     constructor(
         private readonly projectService: ProjectService,
         private readonly listService: ListService,
-        private readonly taskService: TaskService
+        private readonly taskService: TaskService,
+        private readonly activityService: ActivityService
     ) {}
 
     private submitTaskUpdate(taskId: number, projectId: number) {
@@ -65,7 +65,16 @@ export default class ListsController {
         }
 
         const payload = await ListCreateValidator.validate(request.all())
-        await this.listService.create(task, payload)
+        const list = await this.listService.create(task, payload)
+
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list',
+            subjectId: list.id,
+            type: 'list_created',
+            meta: { task_id: task.id, name: list.name },
+        })
 
         this.submitTaskUpdate(task.id, project.id)
 
@@ -91,8 +100,19 @@ export default class ListsController {
             return response.redirect().back()
         }
 
+        const baseList = list.serialize()
+
         const payload = await ListCreateValidator.validate(request.all())
         await this.listService.update(list, payload)
+
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list',
+            subjectId: list.id,
+            type: 'list_updated',
+            meta: { fromName: baseList.name, toName: list.name, task_id: list.taskId },
+        })
 
         this.submitTaskUpdate(list.taskId, project.id)
 
@@ -121,6 +141,15 @@ export default class ListsController {
 
         await this.listService.delete(list)
 
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list',
+            subjectId: list.id,
+            type: 'list_deleted',
+            meta: { task_id: list.taskId, name: list.name },
+        })
+
         this.submitTaskUpdate(list.taskId, project.id)
 
         return response.redirect().back()
@@ -146,7 +175,16 @@ export default class ListsController {
         }
 
         const payload = await ListLineCreateValidator.validate(request.all())
-        await this.listService.createRow(list, payload)
+        const line = await this.listService.createRow(list, payload)
+
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list_line',
+            subjectId: line.id,
+            type: 'list_line_created',
+            meta: { task_id: list.taskId, name: payload.name, listName: list.name },
+        })
 
         this.submitTaskUpdate(list.taskId, project.id)
 
@@ -181,6 +219,15 @@ export default class ListsController {
 
         await this.listService.toggle(line, auth.user)
 
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list_line',
+            subjectId: line.id,
+            type: line.completedAt ? 'list_line_completed' : 'list_line_uncompleted',
+            meta: { task_id: list.taskId, name: line.name, listName: list.name },
+        })
+
         this.submitTaskUpdate(list.taskId, project.id)
 
         return response.redirect().back()
@@ -211,6 +258,16 @@ export default class ListsController {
         }
 
         await this.listService.deleteRow(line)
+
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list_line',
+            subjectId: line.id,
+            type: 'list_line_deleted',
+            meta: { task_id: list.taskId, name: line.name, listName: list.name },
+        })
+
         this.submitTaskUpdate(list.taskId, project.id)
 
         return response.redirect().back()
@@ -240,10 +297,27 @@ export default class ListsController {
             return response.redirect().back()
         }
 
+        const baseLine = line.serialize()
+
         const payload = await ListLineUpdateValidator.validate(request.all())
 
         await this.listService.updateLine(line, payload)
         this.submitTaskUpdate(list.taskId, project.id)
+
+        await this.activityService.createActivity({
+            actorId: auth.user.id,
+            projectId: project.id,
+            subjectType: 'list_line',
+            subjectId: line.id,
+            type: 'list_line_updated',
+            meta: {
+                task_id: list.taskId,
+                fromName: baseLine.name,
+                toName: payload.name,
+                listName: list.name,
+            },
+        })
+
         return response.redirect().back()
     }
 }
