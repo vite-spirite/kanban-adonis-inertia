@@ -28,6 +28,22 @@
                                 </button>
                             </Tab>
 
+                            <Tab
+                                as="template"
+                                v-slot="{ selected }"
+                                v-if="can(pageProps.capabilities, Permissions.PROJECT_ROLE_CREATE)"
+                            >
+                                <button
+                                    class="w-full inline-block text-neutral-900 p-2 outline-none transition cursor-pointer hover:bg-gray-100 relative z-10 border-r-2 py-2 text-left rounded-l-lg"
+                                    :class="{
+                                        'border-neutral-900': selected,
+                                        'border-transparent': !selected,
+                                    }"
+                                >
+                                    Create role
+                                </button>
+                            </Tab>
+
                             <div class="absolute top-0 right-0 w-[2px] h-full bg-gray-200"></div>
                         </TabList>
 
@@ -48,6 +64,48 @@
                                     "
                                 />
                             </TabPanel>
+
+                            <TabPanel
+                                class="h-full"
+                                v-if="can(pageProps.capabilities, Permissions.PROJECT_ROLE_CREATE)"
+                            >
+                                <div class="w-full h-full">
+                                    <div class="container w-full mx-auto">
+                                        <h1 class="text-2xl font-semibold text-gray-800">
+                                            Create new role
+                                        </h1>
+
+                                        <form
+                                            @submit.prevent="createRole"
+                                            class="w-full flex flex-col justify-start items-start space-y-4 mx-auto"
+                                        >
+                                            <div
+                                                class="flex flex-col justify-start items-start w-full space-y-2"
+                                            >
+                                                <label for="name" class="font-medium text-gray-900"
+                                                    >Name</label
+                                                >
+                                                <input
+                                                    v-model="createRoleForm.name"
+                                                    type="text"
+                                                    id="name"
+                                                    name="name"
+                                                    class="w-full p-2 border border-gray-200 rounded-lg outline-none focus:border-blue-500 transition"
+                                                />
+                                            </div>
+
+                                            <div class="w-full text-right">
+                                                <button
+                                                    type="submit"
+                                                    class="inline-flex items-center px-4 py-2 font-medium text-gray-950 bg-gray-200 hover:bg-green-500 hover:text-gray-50 transition rounded-lg cursor-pointer"
+                                                >
+                                                    Create
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </TabPanel>
                         </TabPanels>
                     </TabGroup>
                 </div>
@@ -60,7 +118,7 @@
 import type { InferPageProps } from '@adonisjs/inertia/types'
 import type DashboardController from '#controllers/dashboard_controller'
 
-import { Head, usePage } from '@inertiajs/vue3'
+import { Head, useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
 
@@ -72,4 +130,16 @@ import ProjectPermissionEdit from '~/components/projects/editing/permission.vue'
 
 const page = usePage<InferPageProps<DashboardController, 'roles'>>()
 const pageProps = computed(() => page.props)
+
+const createRoleForm = useForm<{ name: string }>({ name: '' })
+const createRole = () => {
+    createRoleForm.post(`/dashboard/projects/${pageProps.value.project.id}/role`, {
+        onSuccess: () => {
+            createRoleForm.reset()
+        },
+        onError: (errors) => {
+            console.error(errors)
+        },
+    })
+}
 </script>
