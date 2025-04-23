@@ -52,7 +52,9 @@
                                         />
                                     </div>
 
-                                    <div class="grid grid-cols-3 gap-4">
+                                    <div
+                                        class="gap-4 flex flex-row justify-start items-center flex-wrap"
+                                    >
                                         <div
                                             v-for="role in form.roles"
                                             :key="`role_invite_member_${role.id}`"
