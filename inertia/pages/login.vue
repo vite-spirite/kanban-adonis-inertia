@@ -47,10 +47,6 @@
                             }"
                         />
 
-                        <div class="w-full text-right">
-                            <Link href="/" class="text-blue-500">Forgot password?</Link>
-                        </div>
-
                         <span class="text-red-500 font-medium" v-if="form.errors.password">{{
                             form.errors.password
                         }}</span>
